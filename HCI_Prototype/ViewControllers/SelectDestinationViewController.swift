@@ -85,6 +85,10 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         longPressGesture.delegate = self
         self.view.addGestureRecognizer(longPressGesture)
 
+        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler))
+        singleTapGesture.delegate = self
+        singleTapGesture.numberOfTapsRequired = 1
+        self.view.addGestureRecognizer(singleTapGesture)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panHandler))
         panGesture.delegate = self
@@ -242,7 +246,12 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         return SwipeDirection.Undetermined
         
     }
-
+    
+    @objc func singleTapHandler(sender: UITapGestureRecognizer){
+        speechService.stopSpeaking()
+        let text = "Los Angeles, California"
+        parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
+    }
         
     @objc func panHandler(sender: UIPanGestureRecognizer) {
         // A swipe will only be processed if a long press is also in progress

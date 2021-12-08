@@ -10,6 +10,9 @@ import InstantSearchVoiceOverlay
 
 class NavigationViewController: UIViewController {
     
+    @IBOutlet var instructionContentView: UIView!
+    @IBOutlet var otherVoiceOutputContentView: UIView!
+    
     // Outlets
     @IBOutlet var navigationInstruction: UILabel!
     @IBOutlet var otherVoiceOutputs: UILabel!
@@ -41,6 +44,19 @@ class NavigationViewController: UIViewController {
     
     var previousNavigationInstructions: [String] = []
     
+    var simulationIteration: Int = 0
+    
+    var simulationOutputs: [String] = ["Travel east on Cliff Street for 25 meters, toward South Prospect Street",
+                                       "Turn left onto South Prospect Street and continue for .25 kilometers",
+                                       "You are approaching an intersection between South Prospect Street and Maple Street, with a cross walk in 10 meters. Continue straight.",
+                                       "Continue on South Prospect Street for .1 kilometers",
+                                       "alert",
+                                       "some more stuff",
+                                       "You are approaching the entrance to Lafayatte Hall, on your right in 10 meters",
+                                       
+    
+    ]
+    var greenColor = UIColor(red: 9/255.0, green: 59/255.0, blue: 61/255.0, alpha: 1.0)
     var destination: String = ""
     
     var currentDistanceRemaining: Float = 0.0
@@ -93,6 +109,12 @@ class NavigationViewController: UIViewController {
         rightSwipeMenuLabel.text = "Where Am I?"
         rightSwipeMenuLabel.textColor = .white
         rightSwipeMenuLabel.textAlignment = .right
+        
+        navigationInstruction.contentMode = .scaleToFill
+        navigationInstruction.numberOfLines = 0
+        
+        otherVoiceOutputs.contentMode = .scaleToFill
+        otherVoiceOutputs.numberOfLines = 0
         
     }
     
@@ -147,6 +169,14 @@ class NavigationViewController: UIViewController {
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
         
+        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler))
+        singleTapGesture.delegate = self
+        singleTapGesture.numberOfTapsRequired = 1
+        self.view.addGestureRecognizer(singleTapGesture)
+        
+        otherVoiceOutputContentView.layer.cornerRadius = 10.0
+        instructionContentView.layer.cornerRadius = 10.0
+        
         
         
         
@@ -164,18 +194,13 @@ class NavigationViewController: UIViewController {
             } else {
                 speechService.say(noPlayback)
             }
+            
         case .Left:
-
-            let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
-            speechService.say(phrase)
-            previousAudioOutputs.append(phrase)
-            
+            // Here we will present that same modal view by w/ different text
+            outputInformation(phrase: getAroundMe())
         case .Right:
-            
-            let phrase = "You are at the intersection of X and Y"
-            speechService.say(phrase)
-            previousAudioOutputs.append(phrase)
-            
+            // Here we will present a modal view over the explore view
+            outputInformation(phrase: getWhereAmI())
         case .Undetermined:
             break
         }
@@ -215,13 +240,13 @@ class NavigationViewController: UIViewController {
         
         for phrase in helpPhrases {
             if (command.contains(phrase)){
-                speechService.say(startHelpInstructions)
+                speechService.say(navigationHelpInstructions)
                 return
             }
         }
         
         // Check for cancel
-        let cancelPhrases: [String] = ["cancel", "end", "stop"]
+        let cancelPhrases: [String] = ["cancel", "terminate", "end", "stop"]
         
         for phrase in cancelPhrases {
             if (command.contains(phrase)){
@@ -316,6 +341,14 @@ class NavigationViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
         self.dismiss(animated: true, completion: nil)
     }
+    
+    func navigationComplete(){
+        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
+    }
+    
+  
 
 }
 
@@ -379,6 +412,39 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
         if allowSwipe{
             if sender.state == .changed{
                 endingSwipeTranslation = sender.translation(in: sender.view!.superview)
+            }
+        }
+    }
+    
+    // This is for simulation purposes
+    @objc func singleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
+        if sender.location(in: self.view).y < 100{
+            if simulationIteration < simulationOutputs.count{
+                let phrase = simulationOutputs[simulationIteration]
+                if phrase != "alert" {
+                    outputInstruction(phrase: phrase)
+                    
+                } else {
+                    createAndPresentPopup(color: UIColor(red: 255/255, green: 83/255.0, blue: 100/255.0, alpha: 1.0), message: "Alert! There is a large object obstructing your path in 5 meters!")
+                }
+                
+                simulationIteration += 1
+            } else if simulationIteration == simulationOutputs.count{
+                simulationIteration += 1
+                createAndPresentPopup(color: greenColor, message: "You are within 5 meters of the entrance to Lafayatte Hall. Please slowly pan your phone to your left until the entrance is detected")
+                
+
+                
+            } else if simulationIteration == simulationOutputs.count + 1 {
+                simulationIteration += 1
+                createAndPresentPopup(color: greenColor, message: "Entrance detected. Travel straight for 3 meters and the entrance will be directly in front of you")
+            } else if simulationIteration == simulationOutputs.count + 2{
+                createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete")
+                simulationIteration += 1
+                
+            } else {
+                navigationComplete()
             }
         }
     }

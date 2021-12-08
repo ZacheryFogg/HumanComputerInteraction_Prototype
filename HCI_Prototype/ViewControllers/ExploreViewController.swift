@@ -12,6 +12,19 @@ import InstantSearchVoiceOverlay
 class ExploreViewController: UIViewController {
     
     @IBOutlet weak var audioOutputLabel: UILabel!
+    @IBOutlet weak var contentView: UIView!
+    
+    @IBOutlet var upSwipeMenuImage: UIImageView!
+//    @IBOutlet var upSwipeMenuLabel: UILabel!
+    
+    @IBOutlet var leftSwipeMenuImage: UIImageView!
+//    @IBOutlet var leftSwipeMenuLabel: UILabel!
+    
+    @IBOutlet var rightSwipeMenuImage: UIImageView!
+//    @IBOutlet var rightSwipeMenuLabel: UILabel!
+    
+    @IBOutlet var downSwipeMenuImage: UIImageView!
+//    @IBOutlet var downSwipeMenuLabel: UILabel!
     
     let voiceOverlayController = VoiceOverlayController()
         
@@ -64,7 +77,10 @@ class ExploreViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
-        voiceOverlayController.settings.autoStopTimeout = 3.0
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = possibleVoiceCommandSet
+        voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
+        voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
+        voiceOverlayController.settings.autoStopTimeout = 2.0
         
         // Do any additional setup after loading the view.
 //        startDictationButton.backgroundColor = .systemRed
@@ -87,6 +103,22 @@ class ExploreViewController: UIViewController {
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
+        
+        contentView.layer.cornerRadius = 10.0
+        audioOutputLabel.contentMode = .scaleToFill
+        audioOutputLabel.numberOfLines = 0
+        
+        upSwipeMenuImage.image = UIImage(systemName: "arrow.up")?.withRenderingMode(.alwaysTemplate)
+        upSwipeMenuImage.tintColor = .white
+        
+        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
+        leftSwipeMenuImage.tintColor = .white
+        
+        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
+        rightSwipeMenuImage.tintColor = .white
+        
+        downSwipeMenuImage.image = UIImage(systemName: "arrow.down")?.withRenderingMode(.alwaysTemplate)
+        downSwipeMenuImage.tintColor = .white
         
         
 //        simulate()
@@ -213,13 +245,13 @@ class ExploreViewController: UIViewController {
         
         for phrase in helpPhrases {
             if (command.contains(phrase)){
-                speechService.say(startHelpInstructions)
+                speechService.say(explorationHelpInstructions)
                 return
             }
         }
         
         // Check for cancel
-        let cancelPhrases: [String] = ["cancel", "end", "stop"]
+        let cancelPhrases: [String] = ["cancel", "terminate", "end", "stop"]
         
         for phrase in cancelPhrases {
             if (command.contains(phrase)){

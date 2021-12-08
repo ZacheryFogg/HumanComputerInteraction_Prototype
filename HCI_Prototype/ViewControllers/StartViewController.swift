@@ -14,6 +14,7 @@ enum SwipeDirection {
 
 class StartViewController: UIViewController {
     
+    @IBOutlet var contentView: UIView!
     
     //04456e darker  UIColor(red: 4/255, green: 69/255, blue: 110/255, alpha: 1.0)
     //1d5578  UIColor(red: 29/255, green: 85/255, blue: 120/255, alpha: 1.0)
@@ -132,6 +133,8 @@ class StartViewController: UIViewController {
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
+        
+        contentView.layer.cornerRadius = 10.0
         
     }
     

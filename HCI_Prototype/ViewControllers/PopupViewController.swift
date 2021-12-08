@@ -58,7 +58,7 @@ class PopupViewController: UIViewController {
         
         // Do any additional setup after loading the view.
 //        startDictationButton.backgroundColor = .systemRed
-//        startDictationButton.setTitleColor(.white, for: .normal)
+//        startDictationButton.setTitleColor(.white, for: .normal)x
 //
 //        startDictationButton.isAccessibilityElement = true
 //        startDictationButton.accessibilityHint = "Pressing this button start a process to listen for a voice command"
@@ -73,10 +73,15 @@ class PopupViewController: UIViewController {
         panGesture.delegate = self
         self.view.addGestureRecognizer(panGesture)
         
+         
+        
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler))
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
+        
+        messageLabel.contentMode = .scaleToFill
+        messageLabel.numberOfLines = 0
         
     }
     
@@ -150,6 +155,10 @@ extension PopupViewController: UIGestureRecognizerDelegate {
                 endingSwipeTranslation = sender.translation(in: sender.view!.superview)
             }
         }
+    }
+    
+    @objc func singleTapHandler(sender: UITapGestureRecognizer) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {

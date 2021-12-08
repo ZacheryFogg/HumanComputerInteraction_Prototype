@@ -41,11 +41,28 @@ Swipe down or dictate: 'Return to Exploration'... To return to exploration
 let startHelpInstructions =
 """
 You are currently at the start menu.
-You can start a navigation session by dictating "Start Navigation" or gesturing right.
-You can start an exploration session by dictating "Start Exploration" or gesturing left.
+You can start a navigation session by dictating: "Start Navigation", or gesturing right.
+You can start an exploration session by dictating: "Start Exploration", or gesturing left.
 You can hear the most recent instruction by dictating "Playback" or gesturing downwards.
 """
 
+let explorationHelpInstructions =
+"""
+You are currently in an Exploration Session menu.
+You can find out where you are by dictating: "Where am I?", or gesturing right.
+You can here about the significant landmarks in you vicinity by dictating: "What's Around Me?", or gesturing left.
+You can hear the most recent instruction by dictating: "Playback", or gesturing downwards.
+You can terminate this Exploration session and return to the main menu by dictating: "Terminate Exploration", or gesturing upwards.
+"""
+
+let navigationHelpInstructions =
+"""
+You are currently in an Navigation Session menu.
+You can find out where you are by dictating: "Where am I?", or gesturing right.
+You can here about the significant landmarks in you vicinity by dictating: "What's Around Me?", or gesturing left.
+You can hear the most recent instruction by dictating: "Playback", or gesturing downwards.
+You can terminate this Navigation session and return to the main menu by dictating: "Terminate Navigation", or gesturing upwards.
+"""
 
 let couldNotInterpretDication =
 """

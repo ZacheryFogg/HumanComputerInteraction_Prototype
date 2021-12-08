@@ -15,7 +15,6 @@ class CancelViewController: UIViewController {
     
     
     @IBOutlet var messageLabel: UILabel!
-    @IBOutlet var returnToLabel: UILabel!
     
     let voiceOverlayController = VoiceOverlayController()
         
@@ -54,7 +53,10 @@ class CancelViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
-        voiceOverlayController.settings.autoStopTimeout = 3.0
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = ["'Confirm Termination'", "'Return to \(calledFrom!)'", "'Help"]
+        voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
+        voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
+        voiceOverlayController.settings.autoStopTimeout = 2.0
         
         // Do any additional setup after loading the view.
 //        startDictationButton.backgroundColor = .systemRed
@@ -77,6 +79,9 @@ class CancelViewController: UIViewController {
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
+        
+        messageLabel.contentMode = .scaleToFill
+        messageLabel.numberOfLines = 0
         
     }
     
