@@ -10,6 +10,23 @@ import InstantSearchVoiceOverlay
 
 class NavigationViewController: UIViewController {
     
+    // Outlets
+    @IBOutlet var navigationInstruction: UILabel!
+    @IBOutlet var otherVoiceOutputs: UILabel!
+    
+    //    @IBOutlet var upSwipeMenuImage: UIImageView!
+    //    @IBOutlet var upSwipeMenuLabel: UILabel!
+        
+    @IBOutlet var leftSwipeMenuImage: UIImageView!
+    @IBOutlet var leftSwipeMenuLabel: UILabel!
+
+    @IBOutlet var rightSwipeMenuImage: UIImageView!
+    @IBOutlet var rightSwipeMenuLabel: UILabel!
+        
+//        @IBOutlet var downSwipeMenuImage: UIImageView!
+//        @IBOutlet var downSwipeMenuLabel: UILabel!
+    
+    
     let voiceOverlayController = VoiceOverlayController()
         
     let speechService = SpeechService()
@@ -21,6 +38,8 @@ class NavigationViewController: UIViewController {
     var allowSwipe: Bool = false
     
     var previousVoiceCommands: [String] = []
+    
+    var previousNavigationInstructions: [String] = []
     
     var location: String = "Your Mom's House"
     var currentDistanceRemaining: Float = 0.0
@@ -34,13 +53,66 @@ class NavigationViewController: UIViewController {
         "'Help'"
     ]
     
+    var sampleInstructions: [String] = [
+        "Continue along X for Y",
+        "Take an X on Y in Z meters",
+        "Continue along A for B meters",
+        "In X meters, your destination will be on you Y"
+    ]
+    
+    var sampleWhereAmI: [String] = [
+        "You are approaching the intersection of X and Y",
+        "You are X and Y",
+        "I am at your dear mother's house"
+    ]
+    
+    var sampleAroundMe: [String] = [
+        "I am to your left. You are to my right",
+        "10 meters in front of you is the entrance to your mother",
+        "I am 10 meters behind your mom"
+    
+    ]
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationInstruction.text = sampleInstructions.first!
+        otherVoiceOutputs.text = sampleAroundMe.first!
+        
+        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
+        leftSwipeMenuImage.tintColor = .white
+        
+        leftSwipeMenuLabel.text = "What's Around Me?"
+        leftSwipeMenuLabel.textColor = .white
+        leftSwipeMenuLabel.textAlignment = .left
+    
+        
+        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
+        rightSwipeMenuImage.tintColor = .white
+        
+        rightSwipeMenuLabel.text = "Where Am I?"
+        rightSwipeMenuLabel.textColor = .white
+        rightSwipeMenuLabel.textAlignment = .right
+        
+    }
+    
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
-        speechService.say("Navigation Session Started to: \(location)")
-        speechService.say("The destination is: \(currentDistanceRemaining) kilometers away")
-        speechService.say("The journey should take: \(currentTimeRemaining)")
+//        speechService.say("Navigation Session Started to: \(location)")
+//        speechService.say("The destination is: \(currentDistanceRemaining) kilometers away")
+//        speechService.say("The journey should take: \(currentTimeRemaining)")
+        presentChooseDestinationView()
+        print("Am I fuckin missing")
+    }
+    
+    func presentChooseDestinationView(){
+        print("Am I fuckin missing something")
+        let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SelectDestinationViewController") as! SelectDestinationViewController
+        destinationViewController.modalTransitionStyle = .coverVertical
+        destinationViewController.modalPresentationStyle = .popover
+        present(destinationViewController, animated: true, completion: {print("This is where we could dimiss")})
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,6 +144,7 @@ class NavigationViewController: UIViewController {
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
+        
         
     }
     

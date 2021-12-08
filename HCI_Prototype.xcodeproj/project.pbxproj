@@ -20,6 +20,7 @@
 		6F3FBD54273B295300657367 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F3FBD52273B295300657367 /* Main.storyboard */; };
 		6F3FBD56273B295400657367 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F3FBD55273B295400657367 /* Assets.xcassets */; };
 		6F3FBD59273B295400657367 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F3FBD57273B295400657367 /* LaunchScreen.storyboard */; };
+		6FBE7C6427605B5C007A34E7 /* SelectDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBE7C6327605B5C007A34E7 /* SelectDestinationViewController.swift */; };
 		ABD532F68E89B1559E00FCA8 /* Pods_HCI_Prototype.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06FEF81F70A1E3132F4C54 /* Pods_HCI_Prototype.framework */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		6F3FBD5A273B295400657367 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F3FBD5F273B295400657367 /* HCI_PrototypeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HCI_PrototypeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F3FBD69273B295400657367 /* HCI_PrototypeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HCI_PrototypeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FBE7C6327605B5C007A34E7 /* SelectDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDestinationViewController.swift; sourceTree = "<group>"; };
 		9596F01C3C9F8ADE12A38014 /* Pods-HCI_Prototype.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HCI_Prototype.debug.xcconfig"; path = "Target Support Files/Pods-HCI_Prototype/Pods-HCI_Prototype.debug.xcconfig"; sourceTree = "<group>"; };
 		FA06FEF81F70A1E3132F4C54 /* Pods_HCI_Prototype.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HCI_Prototype.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -114,6 +116,7 @@
 				6F2DC0F8275FDBBB00292290 /* CancelViewController.swift */,
 				6F2DC0FA275FDC7000292290 /* NavigationViewController.swift */,
 				6F2DC0FC2760256900292290 /* PopupViewController.swift */,
+				6FBE7C6327605B5C007A34E7 /* SelectDestinationViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -350,6 +353,7 @@
 				6F3FBD51273B295300657367 /* StartViewController.swift in Sources */,
 				6F2DC0F9275FDBBB00292290 /* CancelViewController.swift in Sources */,
 				6F2DC0FB275FDC7000292290 /* NavigationViewController.swift in Sources */,
+				6FBE7C6427605B5C007A34E7 /* SelectDestinationViewController.swift in Sources */,
 				6F3FBD4D273B295300657367 /* AppDelegate.swift in Sources */,
 				6F2DC0FD2760256900292290 /* PopupViewController.swift in Sources */,
 				6F2DC0F0275F9EAB00292290 /* AccessibilityInformation.swift in Sources */,
