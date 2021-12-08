@@ -21,7 +21,7 @@ class ExploreViewController: UIViewController {
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
-    var previousVoiceCommands: [String] = []
+    var previousAudioOutputs: [String] = []
     
     
     override func viewDidAppear(_ animated: Bool) {
@@ -109,7 +109,7 @@ class ExploreViewController: UIViewController {
                         
         case .Down:
             // Here we will play back the most recent audio output
-            if let phrase = previousVoiceCommands.last{
+            if let phrase = previousAudioOutputs.last{
                 speechService.say(phrase)
             } else {
                 speechService.say(noPlayback)
@@ -120,12 +120,12 @@ class ExploreViewController: UIViewController {
 //            print("What's Around Me?")
             let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
             speechService.say(phrase)
-            previousVoiceCommands.append(phrase)
+            previousAudioOutputs.append(phrase)
         case .Right:
             // Here we will present a modal view over the explore view
             let phrase = "You are at the intersection of X and Y"
             speechService.say(phrase)
-            previousVoiceCommands.append(phrase)
+            previousAudioOutputs.append(phrase)
         case .Undetermined:
             break
         }

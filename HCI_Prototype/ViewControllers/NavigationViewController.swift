@@ -37,7 +37,7 @@ class NavigationViewController: UIViewController {
     
     var allowSwipe: Bool = false
     
-    var previousVoiceCommands: [String] = []
+    var previousAudioOutputs: [String] = []
     
     var previousNavigationInstructions: [String] = []
     
@@ -104,11 +104,9 @@ class NavigationViewController: UIViewController {
 //        speechService.say("The destination is: \(currentDistanceRemaining) kilometers away")
 //        speechService.say("The journey should take: \(currentTimeRemaining)")
         presentChooseDestinationView()
-        print("Am I fuckin missing")
     }
     
     func presentChooseDestinationView(){
-        print("Am I fuckin missing something")
         let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SelectDestinationViewController") as! SelectDestinationViewController
         destinationViewController.modalTransitionStyle = .coverVertical
         destinationViewController.modalPresentationStyle = .popover
@@ -125,7 +123,7 @@ class NavigationViewController: UIViewController {
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
         voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = possibleVoiceCommandSet
-        voiceOverlayController.settings.layout.inputScreen.titleListening = "Current Possible Commands"
+        voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
         voiceOverlayController.settings.autoStopTimeout = 3.0
         
         // Do any additional setup after loading the view.
@@ -164,7 +162,7 @@ class NavigationViewController: UIViewController {
                         
         case .Down:
             // Here we will play back the most recent audio output
-            if let phrase = previousVoiceCommands.last{
+            if let phrase = previousAudioOutputs.last{
                 speechService.say(phrase)
             } else {
                 speechService.say(noPlayback)
@@ -173,17 +171,24 @@ class NavigationViewController: UIViewController {
 
             let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
             speechService.say(phrase)
-            previousVoiceCommands.append(phrase)
+            previousAudioOutputs.append(phrase)
             
         case .Right:
             
             let phrase = "You are at the intersection of X and Y"
             speechService.say(phrase)
-            previousVoiceCommands.append(phrase)
+            previousAudioOutputs.append(phrase)
             
         case .Undetermined:
             break
         }
+    }
+    
+    /*
+    When a user has finished dictating a command, interpret it and perform the desired action
+     */
+    func interpretValidVoiceCommand(command: String){
+        
     }
     
     // Dismiss modal view and the
@@ -215,12 +220,6 @@ extension NavigationViewController: VoiceOverlayDelegate {
         
     }
     
-    /*
-    When a user has finished dictating a command, interpret it and perform the desired action
-     */
-    func interpretValidVoiceCommand(command: String){
-        
-    }
 }
 
 /* Logic associated with handling gestures */

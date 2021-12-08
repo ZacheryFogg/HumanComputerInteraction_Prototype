@@ -36,7 +36,7 @@ class StartViewController: UIViewController {
     
 //    UIImage(systemName: "heart.fill")?.withRenderingMode(.alwaysTemplate)
     
-    
+    var previousAudioOutputs: [String] = []
     
     let voiceOverlayController = VoiceOverlayController()
         
@@ -48,14 +48,23 @@ class StartViewController: UIViewController {
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
+    var possibleVoiceCommandSet: [String] = [
+        "'Start Navigation'",
+        "'Start Exploration'",
+        "'Playback most recent audio'",
+        "'Help'"
+    ]
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
 //        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-//        speechService.say(appStartInstructions)
 //        speechService.say("Start Menu View")
 
+        speechService.say(appStartInstructions)
+        previousAudioOutputs.append(appStartInstructions)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -97,7 +106,9 @@ class StartViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
-        voiceOverlayController.settings.autoStopTimeout = 3.0
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = possibleVoiceCommandSet
+        voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
+        voiceOverlayController.settings.autoStopTimeout = 2.0
         
         // Do any additional setup after loading the view.
 //        startDictationButton.backgroundColor = .systemRed
@@ -123,52 +134,115 @@ class StartViewController: UIViewController {
         
     }
     
+    /*
+    When a user has finished dictating a command, interpret it and perform the desired action
+     */
+    func interpretValidVoiceCommand(text: String){
+    
+        speechService.stopSpeaking()
+        
+        let command = text.lowercased()
+        
+        // Check for Navigation
+        let navigationPhrases: [String] = ["navigation", "navigate"]
+        
+        for phrase in navigationPhrases{
+            if (command.contains(phrase)){
+                print("Navigation Mode")
+                launchNavigationSession()
+                return
+            }
+        }
+        
+        // Check for Exploration
+        let explorePhrases: [String] = ["explore", "exploration"]
+        
+        for phrase in explorePhrases {
+            if (command.contains(phrase)){
+                launchExploreSession()
+                return
+            }
+        }
+        
+        // Check for Help
+        let helpPhrases : [String] = ["help"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)){
+                speechService.say(startHelpInstructions)
+                return
+            }
+        }
+        
+        // Check for playback
+        let playbackPhrases : [String] = ["playback", "play back", "repeat"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)) {
+                if let playbackPhrase = previousAudioOutputs.last{
+                    speechService.say(playbackPhrase)
+                    return
+                } else {
+                    speechService.say(noPlayback)
+                    return
+                }
+                
+            }
+        }
+        
+        speechService.say(couldNotInterpretDication)
+        return
+        
+    }
+    
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-        if swipeDirection == SwipeDirection.Right{
-
-            let navigationViewController = self.storyboard?.instantiateViewController(withIdentifier: "NavigationViewController") as! NavigationViewController
-            navigationViewController.modalTransitionStyle = .flipHorizontal
-            navigationViewController.modalPresentationStyle = .fullScreen
-            present(navigationViewController, animated: true, completion: nil)
+        switch swipeDirection{
+        case .Right:
+            self.launchNavigationSession()
+        case .Left:
+            self.launchExploreSession()
+        default:
+            break
             
-        } else if swipeDirection == SwipeDirection.Left {
-            
-            let exploreViewController = self.storyboard?.instantiateViewController(withIdentifier: "ExploreViewController") as! ExploreViewController
-            exploreViewController.modalTransitionStyle = .flipHorizontal
-            exploreViewController.modalPresentationStyle = .fullScreen
-            present(exploreViewController, animated: true, completion: nil)
         }
     }
+    
+    func launchNavigationSession(){
+        let navigationViewController = self.storyboard?.instantiateViewController(withIdentifier: "NavigationViewController") as! NavigationViewController
+        navigationViewController.modalTransitionStyle = .flipHorizontal
+        navigationViewController.modalPresentationStyle = .fullScreen
+        present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    func launchExploreSession(){
+        let exploreViewController = self.storyboard?.instantiateViewController(withIdentifier: "ExploreViewController") as! ExploreViewController
+        exploreViewController.modalTransitionStyle = .flipHorizontal
+        exploreViewController.modalPresentationStyle = .fullScreen
+        present(exploreViewController, animated: true, completion: nil)
+    }
 }
+
 
 extension StartViewController: VoiceOverlayDelegate {
     
     func startDictationEvent() {
+        speechService.stopSpeaking()
         voiceOverlayController.start(on: self, textHandler: {text, final, _ in
-            
+        
             if final {
-                print("Final Text: \(text)")
-            } else {
-                print("In progress: \(text)")
+                self.dismiss(animated: true, completion: nil)
+                if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            
+            print("Error in Dictation: \(error)")
         })
     }
     
     func recording(text: String?, final: Bool?, error: Error?) {
-        if let str = text {
-            print("Hey now: \(str)")
-        }
-        
+        return
     }
     
-    /*
-    When a user has finished dictating a command, interpret it and perform the desired action
-     */
-    func interpretValidVoiceCommand(command: String){
-        
-    }
+    
 }
 
 /* Logic associated with handling gestures */
