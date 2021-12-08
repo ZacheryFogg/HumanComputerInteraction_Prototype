@@ -14,13 +14,37 @@ enum SwipeDirection {
 
 class StartViewController: UIViewController {
     
+    
+    //04456e darker
+    //1d5578
+    
+    // Swipe Menu, this is going to be annoying to configure
+//    @IBOutlet var upSwipeMenuImage: UIImageView!
+//    @IBOutlet var upSwipeMenuLabel: UILabel!
+    
+    @IBOutlet var leftSwipeMenuImage: UIImageView!
+    @IBOutlet var leftSwipeMenuLabel: UILabel!
+    
+    @IBOutlet var rightSwipeMenuImage: UIImageView!
+    @IBOutlet var rightSwipeMenuLabel: UILabel!
+    
+//    @IBOutlet var downSwipeMenuImage: UIImageView!
+//    @IBOutlet var downSwipeMenuLabel: UILabel!
+    
+//    @IBOutlet var centerSwipeMenuImage: UIImageView!
+    
+    
+//    UIImage(systemName: "heart.fill")?.withRenderingMode(.alwaysTemplate)
+    
+    
+    
     let voiceOverlayController = VoiceOverlayController()
         
     let speechService = SpeechService()
          
     var allowSwipe: Bool = false
     
-    var endingSwipeTranslation: CGPoint!
+    var endingSwipeTranslation: CGPoint = CGPoint(x: 0.0, y: 0.0)
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
@@ -33,9 +57,39 @@ class StartViewController: UIViewController {
 //        speechService.say("Start Menu View")
 
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Configure Swipe Menu
+//        upSwipeMenuImage.image = UIImage(systemName: "arrow.up")?.withRenderingMode(.alwaysTemplate)
+//        upSwipeMenuLabel.text = "NA"
+//        upSwipeMenuLabel.textColor = .systemBlue
+        
+        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
+        leftSwipeMenuImage.tintColor = .white
+        
+        leftSwipeMenuLabel.text = "Explore Mode"
+        leftSwipeMenuLabel.textColor = .white
+        leftSwipeMenuLabel.textAlignment = .left
+    
+        
+        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
+        rightSwipeMenuImage.tintColor = .white
+        
+        rightSwipeMenuLabel.text = "Navigation Mode"
+        rightSwipeMenuLabel.textColor = .white
+        rightSwipeMenuLabel.textAlignment = .right
+        
+//        downSwipeMenuImage.image = UIImage(systemName: "arrow.down")?.withRenderingMode(.alwaysTemplate)
+//        downSwipeMenuLabel.text = "NA"
+//        downSwipeMenuLabel.textColor = .systemBlue
+        
+        
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    
         self.view.isUserInteractionEnabled = true
         self.view.isMultipleTouchEnabled = true
         
@@ -179,7 +233,7 @@ extension StartViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
-                print("Failed Swipe Gesture: \(endingSwipeTranslation!)")
+                print("Failed Swipe Gesture: \(endingSwipeTranslation)")
             }
             allowSwipe = false
 

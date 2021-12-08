@@ -9,15 +9,18 @@ import AVFoundation
 
 class SpeechService {
     
-    private let systhesizer = AVSpeechSynthesizer()
-    var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.0
+    private let synthesizer = AVSpeechSynthesizer()
+    var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.1
     
     func say(_ phrase: String) {
         
         let utterance = AVSpeechUtterance(string: phrase)
         utterance.rate = rate
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        systhesizer.speak(utterance) // can be stopped and paused, etc...
+        synthesizer.speak(utterance) // can be stopped and paused, etc...
     }
     
+    func stopSpeaking(){
+        synthesizer.stopSpeaking(at: .immediate)
+    }
 }

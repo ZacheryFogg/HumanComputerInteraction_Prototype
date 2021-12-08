@@ -14,18 +14,33 @@ class NavigationViewController: UIViewController {
         
     let speechService = SpeechService()
          
-    var endingSwipeTranslation: CGPoint!
+    var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
     var allowSwipe: Bool = false
     
+    var previousVoiceCommands: [String] = []
+    
+    var location: String = "Your Mom's House"
+    var currentDistanceRemaining: Float = 0.0
+    var currentTimeRemaining: String = "10 minutes"
+    
+    var possibleVoiceCommandSet: [String] = [
+        "'What's around me?'",
+        "'Where Am I?'",
+        "'Cancel navigation'",
+        "'Playback most recent audio'",
+        "'Help'"
+    ]
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-//        speechService.say("Navigation View")
+        speechService.say("Navigation Session Started to: \(location)")
+        speechService.say("The destination is: \(currentDistanceRemaining) kilometers away")
+        speechService.say("The journey should take: \(currentTimeRemaining)")
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,14 +52,11 @@ class NavigationViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = possibleVoiceCommandSet
+        voiceOverlayController.settings.layout.inputScreen.titleListening = "Current Possible Commands"
         voiceOverlayController.settings.autoStopTimeout = 3.0
         
         // Do any additional setup after loading the view.
-//        startDictationButton.backgroundColor = .systemRed
-//        startDictationButton.setTitleColor(.white, for: .normal)
-//
-//        startDictationButton.isAccessibilityElement = true
-//        startDictationButton.accessibilityHint = "Pressing this button start a process to listen for a voice command"
         
         // Add gesture recognizers to view
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -64,9 +76,47 @@ class NavigationViewController: UIViewController {
     }
     
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-//        if swipeDirection == SwipeDirection.Right{
-//            performSegue(withIdentifier: "", sender: nil)
-//        }
+        speechService.stopSpeaking()
+        switch swipeDirection {
+        case .Up:
+            
+            // Present the confirm cancelation modal with message
+            let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
+            cancelViewController.modalTransitionStyle = .flipHorizontal
+            cancelViewController.modalPresentationStyle = .overCurrentContext
+            cancelViewController.passedMessage = navigationCancelationPrompt
+            cancelViewController.calledFrom = "Navigation"
+            
+            present(cancelViewController, animated: true, completion: nil)
+                        
+        case .Down:
+            // Here we will play back the most recent audio output
+            if let phrase = previousVoiceCommands.last{
+                speechService.say(phrase)
+            } else {
+                speechService.say(noPlayback)
+            }
+        case .Left:
+
+            let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
+            speechService.say(phrase)
+            previousVoiceCommands.append(phrase)
+            
+        case .Right:
+            
+            let phrase = "You are at the intersection of X and Y"
+            speechService.say(phrase)
+            previousVoiceCommands.append(phrase)
+            
+        case .Undetermined:
+            break
+        }
+    }
+    
+    // Dismiss modal view and the
+    func confirmedCancelation(){
+        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -144,7 +194,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
-        self.dismiss(animated: true, completion: nil)
+        startDictationEvent()
     }
     
   
@@ -162,7 +212,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
-                print("Failed Swipe Gesture: \(endingSwipeTranslation!)")
+                print("Failed Swipe Gesture: \(endingSwipeTranslation)")
             }
             allowSwipe = false
 

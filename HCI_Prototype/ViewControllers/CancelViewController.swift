@@ -13,24 +13,35 @@ import InstantSearchVoiceOverlay
 
 class CancelViewController: UIViewController {
     
+    
+    @IBOutlet var messageLabel: UILabel!
+    @IBOutlet var returnToLabel: UILabel!
+    
     let voiceOverlayController = VoiceOverlayController()
         
     let speechService = SpeechService()
          
     var allowSwipe: Bool = false
     
-    var endingSwipeTranslation: CGPoint!
+    var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
-    var passedMessage: String?
+    var passedMessage: String!
+    var calledFrom: String!
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        messageLabel.text = passedMessage
+        returnToLabel.text = "V Return to \(calledFrom!)"
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
 //        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-        speechService.say(passedMessage!)
+        speechService.say(passedMessage)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,6 +78,25 @@ class CancelViewController: UIViewController {
         self.view.addGestureRecognizer(doubleTapGesture)
         
     }
+    
+    func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
+        speechService.stopSpeaking()
+        switch swipeDirection {
+
+        // Cancelation Confirmed -> Return to Start Menu
+        case .Up:
+            speechService.say("Canceling \(calledFrom!)")
+            self.presentingViewController?.dismissFromChild()
+        // Canceled Cancelation -> Return to Explore Mode
+        case .Down:
+            speechService.say("Returning to \(calledFrom!)")
+            self.dismiss(animated: true, completion: nil)
+        default:
+            break
+            print("Do nothing here")
+        }
+    }
+    
 }
 
 extension CancelViewController: VoiceOverlayDelegate {
@@ -131,10 +161,7 @@ extension CancelViewController: UIGestureRecognizerDelegate {
         return SwipeDirection.Undetermined
         
     }
-    
-    func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-        print(swipeDirection)
-    }
+
         
     @objc func panHandler(sender: UIPanGestureRecognizer) {
         // A swipe will only be processed if a long press is also in progress
@@ -164,7 +191,7 @@ extension CancelViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
-                print("Failed Swipe Gesture: \(endingSwipeTranslation!)")
+                print("Failed Swipe Gesture: \(endingSwipeTranslation)")
             }
             allowSwipe = false
 
@@ -180,5 +207,12 @@ extension CancelViewController: UIGestureRecognizerDelegate {
     }
 }
 
+
+extension UIViewController {
+    func dismissFromChild(){
+        dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
+    }
+}
 
 

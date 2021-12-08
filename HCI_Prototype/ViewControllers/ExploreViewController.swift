@@ -17,16 +17,20 @@ class ExploreViewController: UIViewController {
          
     var allowSwipe: Bool = false
     
-    var endingSwipeTranslation: CGPoint!
+    var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
     
     let minTravelDistForSwipe: CGFloat = 50.0
+    
+    var previousVoiceCommands: [String] = []
+    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
 //        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-//        speechService.say("Navigation View")
+        speechService.say("Exploration Session Started")
+        
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +66,69 @@ class ExploreViewController: UIViewController {
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
         
+//        simulate()
+        
+    }
+    
+
+    
+    func simulate() {
+        let seconds = 3.0
+//        await Task.sleep(UInt64(seconds * Double(NSEC_PER_SEC)))
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+            self.createAndPresentPopup(color: UIColor.systemRed, message: "This is a very important Alert")
+//            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+//                self.createAndPresentPopup(color: UIColor.systemBlue, message: "This is a very important Alert")
+//            }
+        }
+        
+        
+    }
+    
+    func createAndPresentPopup(color: UIColor, message: String) {
+        let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
+        popupViewController.modalTransitionStyle = .coverVertical
+        popupViewController.modalPresentationStyle = .popover
+        popupViewController.passedMessage = message
+        popupViewController.color = color
+        present(popupViewController, animated: true, completion: {print("This is where we could dimiss")})
+    }
+    
+    func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
+        speechService.stopSpeaking()
+        switch swipeDirection {
+        case .Up:
+            // Present the confirm cancelation modal with message
+            
+            let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
+            cancelViewController.modalTransitionStyle = .flipHorizontal
+            cancelViewController.modalPresentationStyle = .overCurrentContext
+            cancelViewController.passedMessage = explorationCancelationPrompt
+            cancelViewController.calledFrom = "Exploration"
+            present(cancelViewController, animated: true, completion: nil)
+                        
+        case .Down:
+            // Here we will play back the most recent audio output
+            if let phrase = previousVoiceCommands.last{
+                speechService.say(phrase)
+            } else {
+                speechService.say(noPlayback)
+            }
+            
+        case .Left:
+            // Here we will present that same modal view by w/ different text
+//            print("What's Around Me?")
+            let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
+            speechService.say(phrase)
+            previousVoiceCommands.append(phrase)
+        case .Right:
+            // Here we will present a modal view over the explore view
+            let phrase = "You are at the intersection of X and Y"
+            speechService.say(phrase)
+            previousVoiceCommands.append(phrase)
+        case .Undetermined:
+            break
+        }
     }
 }
 
@@ -117,7 +184,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
         // This logic should be updated later
 //        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-        print(angle)
+//        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -127,10 +194,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
         return SwipeDirection.Undetermined
         
     }
-    
-    func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-        print(swipeDirection)
-    }
+
         
     @objc func panHandler(sender: UIPanGestureRecognizer) {
         // A swipe will only be processed if a long press is also in progress
@@ -160,7 +224,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
-                print("Failed Swipe Gesture: \(endingSwipeTranslation!)")
+                print("Failed Swipe Gesture: \(endingSwipeTranslation)")
             }
             allowSwipe = false
 
@@ -187,6 +251,8 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
         }
     }
 }
+
+
 
 
 
