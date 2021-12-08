@@ -15,8 +15,8 @@ enum SwipeDirection {
 class StartViewController: UIViewController {
     
     
-    //04456e darker
-    //1d5578
+    //04456e darker  UIColor(red: 4/255, green: 69/255, blue: 110/255, alpha: 1.0)
+    //1d5578  UIColor(red: 29/255, green: 85/255, blue: 120/255, alpha: 1.0)
     
     // Swipe Menu, this is going to be annoying to configure
 //    @IBOutlet var upSwipeMenuImage: UIImageView!
@@ -102,6 +102,7 @@ class StartViewController: UIViewController {
         self.view.isUserInteractionEnabled = true
         self.view.isMultipleTouchEnabled = true
         
+        speechService.muted = false
         // Preconfigure voiceOverlayController
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
@@ -174,10 +175,11 @@ class StartViewController: UIViewController {
             }
         }
         
-        // Check for playback
+        
+        // Check for Playback
         let playbackPhrases : [String] = ["playback", "play back", "repeat"]
         
-        for phrase in helpPhrases {
+        for phrase in playbackPhrases {
             if (command.contains(phrase)) {
                 if let playbackPhrase = previousAudioOutputs.last{
                     speechService.say(playbackPhrase)
@@ -196,6 +198,7 @@ class StartViewController: UIViewController {
     }
     
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
+        speechService.stopSpeaking()
         switch swipeDirection{
         case .Right:
             self.launchNavigationSession()
@@ -211,6 +214,7 @@ class StartViewController: UIViewController {
         let navigationViewController = self.storyboard?.instantiateViewController(withIdentifier: "NavigationViewController") as! NavigationViewController
         navigationViewController.modalTransitionStyle = .flipHorizontal
         navigationViewController.modalPresentationStyle = .fullScreen
+        navigationViewController.speechService = speechService
         present(navigationViewController, animated: true, completion: nil)
     }
     
@@ -218,6 +222,7 @@ class StartViewController: UIViewController {
         let exploreViewController = self.storyboard?.instantiateViewController(withIdentifier: "ExploreViewController") as! ExploreViewController
         exploreViewController.modalTransitionStyle = .flipHorizontal
         exploreViewController.modalPresentationStyle = .fullScreen
+        exploreViewController.speechService = speechService
         present(exploreViewController, animated: true, completion: nil)
     }
 }

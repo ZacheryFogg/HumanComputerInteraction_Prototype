@@ -11,9 +11,11 @@ import InstantSearchVoiceOverlay
 
 class ExploreViewController: UIViewController {
     
+    @IBOutlet weak var audioOutputLabel: UILabel!
+    
     let voiceOverlayController = VoiceOverlayController()
         
-    let speechService = SpeechService()
+    var speechService: SpeechService!
          
     var allowSwipe: Bool = false
     
@@ -23,6 +25,26 @@ class ExploreViewController: UIViewController {
     
     var previousAudioOutputs: [String] = []
     
+    var possibleVoiceCommandSet: [String] = [
+        "'What's around me?'",
+        "'Where Am I?'",
+        "'Terminate exploration'",
+        "'Playback most recent audio'",
+        "'Help'"
+    ]
+   
+    var sampleWhereAmI: [String] = [
+        "You are approaching the intersection of X and Y",
+        "You are X and Y",
+        "I am at your dear mother's house"
+    ]
+    
+    var sampleAroundMe: [String] = [
+        "I am to your left. You are to my right",
+        "10 meters in front of you is the entrance to your mother",
+        "I am 10 meters behind your mom"
+    
+    ]
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -66,6 +88,7 @@ class ExploreViewController: UIViewController {
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
         
+        
 //        simulate()
         
     }
@@ -94,18 +117,25 @@ class ExploreViewController: UIViewController {
         present(popupViewController, animated: true, completion: {print("This is where we could dimiss")})
     }
     
+    func promptCancelExploration(){
+        // Present the confirm cancelation modal with message
+        let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
+        cancelViewController.modalTransitionStyle = .flipHorizontal
+        cancelViewController.modalPresentationStyle = .overCurrentContext
+        cancelViewController.passedMessage = explorationCancelationPrompt
+        cancelViewController.speechService = speechService
+        cancelViewController.parentVC = self
+        cancelViewController.calledFrom = "Exploration"
+        
+        present(cancelViewController, animated: true, completion: nil)
+    }
+    
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
         speechService.stopSpeaking()
         switch swipeDirection {
         case .Up:
             // Present the confirm cancelation modal with message
-            
-            let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
-            cancelViewController.modalTransitionStyle = .flipHorizontal
-            cancelViewController.modalPresentationStyle = .overCurrentContext
-            cancelViewController.passedMessage = explorationCancelationPrompt
-            cancelViewController.calledFrom = "Exploration"
-            present(cancelViewController, animated: true, completion: nil)
+            promptCancelExploration()
                         
         case .Down:
             // Here we will play back the most recent audio output
@@ -117,41 +147,127 @@ class ExploreViewController: UIViewController {
             
         case .Left:
             // Here we will present that same modal view by w/ different text
-//            print("What's Around Me?")
-            let phrase = "X is 50 meters to your left, Y is 10 meters to your direction"
-            speechService.say(phrase)
-            previousAudioOutputs.append(phrase)
+            outputInformation(phrase: getAroundMe())
         case .Right:
             // Here we will present a modal view over the explore view
-            let phrase = "You are at the intersection of X and Y"
-            speechService.say(phrase)
-            previousAudioOutputs.append(phrase)
+            outputInformation(phrase: getWhereAmI())
         case .Undetermined:
             break
         }
+    }
+    
+   
+
+    // Ouput information that is not an explicit navigation instruction in both audio format and to screen visually
+    func outputInformation(phrase: String){
+        speechService.say(phrase)
+        previousAudioOutputs.append(phrase)
+        audioOutputLabel.text = phrase
+    }
+    
+    func getAroundMe() -> String{
+        if let sample = sampleAroundMe.randomElement(){
+            return sample
+        }
+        return "Nothing is around you, you exist in a void"
+    }
+    
+    func getWhereAmI() -> String{
+        if let sample = sampleWhereAmI.randomElement(){
+            return sample
+        }
+        return "You are the infinite, and are thus, everywhere"
+    }
+    
+    /*
+    When a user has finished dictating a command, interpret it and perform the desired action
+     */
+    func interpretValidVoiceCommand(text: String){
+    
+        speechService.stopSpeaking()
+        
+        let command = text.lowercased()
+        
+        // Check for Around Me
+        let aroundMePhrases: [String] = ["around", "near"]
+        
+        for phrase in aroundMePhrases{
+            if (command.contains(phrase)){
+                outputInformation(phrase: getAroundMe())
+                return
+            }
+        }
+        
+        // Check for Where Am I
+        let whereAmIPhrases: [String] = ["where"]
+        
+        for phrase in whereAmIPhrases {
+            if (command.contains(phrase)){
+                outputInformation(phrase: getWhereAmI())
+                return
+            }
+        }
+        
+        // Check for Help
+        let helpPhrases : [String] = ["help"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)){
+                speechService.say(startHelpInstructions)
+                return
+            }
+        }
+        
+        // Check for cancel
+        let cancelPhrases: [String] = ["cancel", "end", "stop"]
+        
+        for phrase in cancelPhrases {
+            if (command.contains(phrase)){
+                promptCancelExploration()
+                return
+            }
+        }
+        
+        
+        // Check for Playback
+        let playbackPhrases : [String] = ["playback", "play back", "repeat", "play"]
+        print(command)
+        for phrase in playbackPhrases {
+            if (command.contains(phrase)) {
+                if let playbackPhrase = previousAudioOutputs.last{
+                    speechService.say(playbackPhrase)
+                    return
+                } else {
+                    speechService.say(noPlayback)
+                    return
+                }
+                
+            }
+        }
+        
+        speechService.say(couldNotInterpretDication)
+        return
     }
 }
 
 extension ExploreViewController: VoiceOverlayDelegate {
     
     func startDictationEvent() {
+        speechService.stopSpeaking()
         voiceOverlayController.start(on: self, textHandler: {text, final, _ in
-            
+        
             if final {
-                print("Final Text: \(text)")
-            } else {
-                print("In progress: \(text)")
+                print(text)
+                self.dismiss(animated: true, completion: nil)
+                if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            
+            print("Error in Dictation: \(error)")
         })
     }
     
     func recording(text: String?, final: Bool?, error: Error?) {
-        if let str = text {
-            print("Hey now: \(str)")
-        }
-        
+        return
     }
     
     /*
@@ -206,7 +322,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
-        self.dismiss(animated: true, completion: nil)
+        startDictationEvent()
     }
     
   

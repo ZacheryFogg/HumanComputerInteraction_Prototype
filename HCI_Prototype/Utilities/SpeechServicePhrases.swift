@@ -25,8 +25,8 @@ let noPlayback: String = "There is no recent audio to playback at this time"
 let navigationCancelationPrompt =
 """
 Are you sure that you want to end your navigation session?
-Swipe up or dictate. 'Confirm'. to confirm cancelation.
-Swipe down or dictate. 'Return to Navigation'. to return to navigation
+Gesture upwards or dictate. 'Confirm'. to confirm cancelation.
+Gesture downwards or dictate. 'Return to Navigation'. to return to navigation
 """
 
 
@@ -43,7 +43,7 @@ let startHelpInstructions =
 You are currently at the start menu.
 You can start a navigation session by dictating "Start Navigation" or gesturing right.
 You can start an exploration session by dictating "Start Exploration" or gesturing left.
-You can hear the most recent instruction by dictating "Playback" or gesturing down.
+You can hear the most recent instruction by dictating "Playback" or gesturing downwards.
 """
 
 
@@ -51,4 +51,26 @@ let couldNotInterpretDication =
 """
 Your voice command did not match any of the current available commands.
 Please dictate: 'Help', to hear a list of the current commands available to you.
+"""
+
+let terminationHelpInstructionsP1 =
+
+"""
+You are currently being prompted to confirm the termination of your: 
+"""
+
+let terminationHelpInstructionsP2 =
+"""
+ session. Gesture upwards or dictate: 'Confirm', to confirm the termination.
+Gesture downwards or dictate: 'Cancel', to cancel the termination and return to you session.
+"""
+
+let selectDestinationInstructions =
+
+"""
+You are currently being prompted to choose a destination.
+You may dictate your destination, or you may use Voice Over
+functionality to type your destination into the already selected search bar.
+You can also terminate this navigation session by gesturing upwards
+or dictating: 'Terminate Destination Selection'
 """

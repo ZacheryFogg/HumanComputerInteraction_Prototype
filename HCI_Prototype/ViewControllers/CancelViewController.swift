@@ -19,7 +19,7 @@ class CancelViewController: UIViewController {
     
     let voiceOverlayController = VoiceOverlayController()
         
-    let speechService = SpeechService()
+    var speechService: SpeechService!
          
     var allowSwipe: Bool = false
     
@@ -29,11 +29,12 @@ class CancelViewController: UIViewController {
     
     var passedMessage: String!
     var calledFrom: String!
+    var parentVC: UIViewController!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         messageLabel.text = passedMessage
-        returnToLabel.text = "V Return to \(calledFrom!)"
+//        returnToLabel.text = "V Return to \(calledFrom!)"
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -82,19 +83,69 @@ class CancelViewController: UIViewController {
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
         speechService.stopSpeaking()
         switch swipeDirection {
-
         // Cancelation Confirmed -> Return to Start Menu
         case .Up:
-            speechService.say("Canceling \(calledFrom!)")
-            self.presentingViewController?.dismissFromChild()
+            
+//            speechService.say("Terminating \(calledFrom!)")
+//            self.presentingViewController?.dismissFromChild()
+            terminate()
         // Canceled Cancelation -> Return to Explore Mode
         case .Down:
             speechService.say("Returning to \(calledFrom!)")
             self.dismiss(animated: true, completion: nil)
         default:
             break
-            print("Do nothing here")
         }
+    }
+    
+    /*
+    When a user has finished dictating a command, interpret it and perform the desired action
+     */
+    func interpretValidVoiceCommand(text: String){
+        speechService.stopSpeaking()
+        let command = text.lowercased()
+        
+        // Confirm Termination
+        let confirmPhrases: [String] = ["confirm", "continue", "end"]
+        
+        for phrase in confirmPhrases{
+            if (command.contains(phrase)){
+                terminate()
+                return
+            }
+        }
+        
+        
+        // Check for Help
+        let helpPhrases : [String] = ["help"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)){
+                speechService.say("\(terminationHelpInstructionsP1)\(calledFrom!)\(terminationHelpInstructionsP2)")
+                return
+            }
+        }
+        
+        // Check for cancel
+        let cancelPhrases: [String] = ["cancel", "return"]
+        
+        for phrase in cancelPhrases {
+            if (command.contains(phrase)){
+                speechService.say("Returning to \(calledFrom!)")
+                self.dismiss(animated: true, completion: nil)
+                return
+                
+            }
+        }
+        
+        speechService.say(couldNotInterpretDication)
+        
+    }
+    
+    func terminate(){
+        speechService.say("Terminating \(calledFrom!)")
+        self.presentingViewController?.dismissFromChild(child: self)
+        
     }
     
 }
@@ -102,31 +153,23 @@ class CancelViewController: UIViewController {
 extension CancelViewController: VoiceOverlayDelegate {
     
     func startDictationEvent() {
+        speechService.stopSpeaking()
         voiceOverlayController.start(on: self, textHandler: {text, final, _ in
-            
+        
             if final {
-                print("Final Text: \(text)")
-            } else {
-                print("In progress: \(text)")
+                print(text)
+                self.dismiss(animated: true, completion: nil)
+                if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            
+            print("Error in Dictation: \(error)")
         })
     }
     
     func recording(text: String?, final: Bool?, error: Error?) {
-        if let str = text {
-            print("Hey now: \(str)")
-        }
-        
+        return
     }
     
-    /*
-    When a user has finished dictating a command, interpret it and perform the desired action
-     */
-    func interpretValidVoiceCommand(command: String){
-        
-    }
 }
 
 /* Logic associated with handling gestures */
@@ -151,7 +194,6 @@ extension CancelViewController: UIGestureRecognizerDelegate {
         // This logic should be updated later
 //        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -173,7 +215,7 @@ extension CancelViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
-        self.dismiss(animated: true, completion: nil)
+        startDictationEvent()
     }
     
   
@@ -208,11 +250,5 @@ extension CancelViewController: UIGestureRecognizerDelegate {
 }
 
 
-extension UIViewController {
-    func dismissFromChild(){
-        dismiss(animated: true, completion: nil)
-        dismiss(animated: true, completion: nil)
-    }
-}
 
 

@@ -29,7 +29,7 @@ class NavigationViewController: UIViewController {
     
     let voiceOverlayController = VoiceOverlayController()
         
-    let speechService = SpeechService()
+    var speechService: SpeechService!
          
     var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
     
@@ -41,14 +41,15 @@ class NavigationViewController: UIViewController {
     
     var previousNavigationInstructions: [String] = []
     
-    var location: String = "Your Mom's House"
+    var destination: String = ""
+    
     var currentDistanceRemaining: Float = 0.0
     var currentTimeRemaining: String = "10 minutes"
     
     var possibleVoiceCommandSet: [String] = [
         "'What's around me?'",
         "'Where Am I?'",
-        "'Cancel navigation'",
+        "'Terminate navigation'",
         "'Playback most recent audio'",
         "'Help'"
     ]
@@ -110,7 +111,9 @@ class NavigationViewController: UIViewController {
         let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SelectDestinationViewController") as! SelectDestinationViewController
         destinationViewController.modalTransitionStyle = .coverVertical
         destinationViewController.modalPresentationStyle = .popover
-        present(destinationViewController, animated: true, completion: {print("This is where we could dimiss")})
+        destinationViewController.parentVC = self
+        destinationViewController.speechService = speechService
+        present(destinationViewController, animated: true, completion: nil)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -124,7 +127,8 @@ class NavigationViewController: UIViewController {
         voiceOverlayController.settings.autoStop = true
         voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = possibleVoiceCommandSet
         voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
-        voiceOverlayController.settings.autoStopTimeout = 3.0
+        voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
+        voiceOverlayController.settings.autoStopTimeout = 2.0
         
         // Do any additional setup after loading the view.
         
@@ -144,22 +148,15 @@ class NavigationViewController: UIViewController {
         self.view.addGestureRecognizer(doubleTapGesture)
         
         
+        
+        
     }
     
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
         speechService.stopSpeaking()
         switch swipeDirection {
         case .Up:
-            
-            // Present the confirm cancelation modal with message
-            let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
-            cancelViewController.modalTransitionStyle = .flipHorizontal
-            cancelViewController.modalPresentationStyle = .overCurrentContext
-            cancelViewController.passedMessage = navigationCancelationPrompt
-            cancelViewController.calledFrom = "Navigation"
-            
-            present(cancelViewController, animated: true, completion: nil)
-                        
+            promptCancelNavigation()
         case .Down:
             // Here we will play back the most recent audio output
             if let phrase = previousAudioOutputs.last{
@@ -187,37 +184,159 @@ class NavigationViewController: UIViewController {
     /*
     When a user has finished dictating a command, interpret it and perform the desired action
      */
-    func interpretValidVoiceCommand(command: String){
+    func interpretValidVoiceCommand(text: String){
+    
+        speechService.stopSpeaking()
         
+        let command = text.lowercased()
+        
+        // Check for Around Me
+        let aroundMePhrases: [String] = ["around", "near"]
+        
+        for phrase in aroundMePhrases{
+            if (command.contains(phrase)){
+                outputInformation(phrase: getAroundMe())
+                return
+            }
+        }
+        
+        // Check for Where Am I
+        let whereAmIPhrases: [String] = ["where"]
+        
+        for phrase in whereAmIPhrases {
+            if (command.contains(phrase)){
+                outputInformation(phrase: getWhereAmI())
+                return
+            }
+        }
+        
+        // Check for Help
+        let helpPhrases : [String] = ["help"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)){
+                speechService.say(startHelpInstructions)
+                return
+            }
+        }
+        
+        // Check for cancel
+        let cancelPhrases: [String] = ["cancel", "end", "stop"]
+        
+        for phrase in cancelPhrases {
+            if (command.contains(phrase)){
+                promptCancelNavigation()
+                return
+            }
+        }
+        
+        
+        // Check for Playback
+        let playbackPhrases : [String] = ["playback", "play back", "repeat", "play"]
+        print(command)
+        for phrase in playbackPhrases {
+            if (command.contains(phrase)) {
+                if let playbackPhrase = previousAudioOutputs.last{
+                    speechService.say(playbackPhrase)
+                    return
+                } else {
+                    speechService.say(noPlayback)
+                    return
+                }
+                
+            }
+        }
+        
+        speechService.say(couldNotInterpretDication)
+        return
     }
     
-    // Dismiss modal view and the
-    func confirmedCancelation(){
+    // Ouput an instruction in both audio format and to screen visually
+    func outputInstruction(phrase: String){
+        speechService.say(phrase)
+        previousAudioOutputs.append(phrase)
+        navigationInstruction.text = phrase
+    }
+    
+    // Ouput information that is not an explicit navigation instruction in both audio format and to screen visually
+    func outputInformation(phrase: String){
+        speechService.say(phrase)
+        previousAudioOutputs.append(phrase)
+        otherVoiceOutputs.text = phrase
+    }
+    
+    func getAroundMe() -> String{
+        if let sample = sampleAroundMe.randomElement(){
+            return sample
+        }
+        return "Nothing is around you, you exist in a void"
+    }
+    
+    func getWhereAmI() -> String{
+        if let sample = sampleWhereAmI.randomElement(){
+            return sample
+        }
+        return "You are the infinite, and are thus, everywhere"
+    }
+    
+    func promptCancelNavigation(){
+        // Present the confirm cancelation modal with message
+        let cancelViewController = self.storyboard?.instantiateViewController(withIdentifier: "CancelViewController") as! CancelViewController
+        cancelViewController.modalTransitionStyle = .flipHorizontal
+        cancelViewController.modalPresentationStyle = .overCurrentContext
+        cancelViewController.passedMessage = navigationCancelationPrompt
+        cancelViewController.speechService = speechService
+        cancelViewController.parentVC = self
+        cancelViewController.calledFrom = "Navigation"
+        
+        present(cancelViewController, animated: true, completion: nil)
+    }
+    
+    func createAndPresentPopup(color: UIColor, message: String) {
+        let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
+        popupViewController.modalTransitionStyle = .coverVertical
+        popupViewController.modalPresentationStyle = .popover
+        popupViewController.passedMessage = message
+        popupViewController.color = color
+        present(popupViewController, animated: true, completion: nil)
+    }
+    
+    func retrieveDestinationAndTerminateChild(child: SelectDestinationViewController, destination: String) {
+        child.dismiss(animated: true, completion: nil)
+        self.destination = destination
+        startNavigationToDestination(destination: destination)
+    }
+    
+    func startNavigationToDestination(destination: String){
+        outputInformation(phrase: "Starting navigation to: \(destination)")
+    }
+    
+    func terminateFromChild(child: UIViewController){
+        child.dismiss(animated: true , completion: nil)
         self.dismiss(animated: true, completion: nil)
         self.dismiss(animated: true, completion: nil)
     }
+
 }
 
 extension NavigationViewController: VoiceOverlayDelegate {
     
     func startDictationEvent() {
+        speechService.stopSpeaking()
         voiceOverlayController.start(on: self, textHandler: {text, final, _ in
-            
+        
             if final {
-                print("Final Text: \(text)")
-            } else {
-                print("In progress: \(text)")
+                print(text)
+                self.dismiss(animated: true, completion: nil)
+                if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            
+            print("Error in Dictation: \(error)")
         })
     }
     
     func recording(text: String?, final: Bool?, error: Error?) {
-        if let str = text {
-            print("Hey now: \(str)")
-        }
-        
+        return
     }
     
 }
@@ -244,7 +363,6 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
         // This logic should be updated later
 //        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -297,5 +415,16 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
+    }
+}
+
+extension UIViewController {
+    func dismissFromChild(child: UIViewController){
+        child.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func dismissChild(child: UIViewController){
+        child.dismiss(animated: true, completion: nil)
     }
 }
