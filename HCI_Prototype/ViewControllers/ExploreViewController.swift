@@ -14,17 +14,7 @@ class ExploreViewController: UIViewController {
     @IBOutlet weak var audioOutputLabel: UILabel!
     @IBOutlet weak var contentView: UIView!
     
-    @IBOutlet var upSwipeMenuImage: UIImageView!
-//    @IBOutlet var upSwipeMenuLabel: UILabel!
-    
-    @IBOutlet var leftSwipeMenuImage: UIImageView!
-//    @IBOutlet var leftSwipeMenuLabel: UILabel!
-    
-    @IBOutlet var rightSwipeMenuImage: UIImageView!
-//    @IBOutlet var rightSwipeMenuLabel: UILabel!
-    
-    @IBOutlet var downSwipeMenuImage: UIImageView!
-//    @IBOutlet var downSwipeMenuLabel: UILabel!
+    @IBOutlet weak var explorationMenu: UIImageView!
     
     let voiceOverlayController = VoiceOverlayController()
         
@@ -49,13 +39,10 @@ class ExploreViewController: UIViewController {
     var sampleWhereAmI: [String] = [
         "You are approaching the intersection of X and Y",
         "You are X and Y",
-        "I am at your dear mother's house"
     ]
     
     var sampleAroundMe: [String] = [
         "I am to your left. You are to my right",
-        "10 meters in front of you is the entrance to your mother",
-        "I am 10 meters behind your mom"
     
     ]
     
@@ -108,20 +95,7 @@ class ExploreViewController: UIViewController {
         audioOutputLabel.contentMode = .scaleToFill
         audioOutputLabel.numberOfLines = 0
         
-        upSwipeMenuImage.image = UIImage(systemName: "arrow.up")?.withRenderingMode(.alwaysTemplate)
-        upSwipeMenuImage.tintColor = .white
-        
-        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
-        leftSwipeMenuImage.tintColor = .white
-        
-        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
-        rightSwipeMenuImage.tintColor = .white
-        
-        downSwipeMenuImage.image = UIImage(systemName: "arrow.down")?.withRenderingMode(.alwaysTemplate)
-        downSwipeMenuImage.tintColor = .white
-        
-        
-//        simulate()
+        explorationMenu.image = UIImage(named: "explorationMenu")
         
     }
     
@@ -145,6 +119,7 @@ class ExploreViewController: UIViewController {
         popupViewController.modalTransitionStyle = .coverVertical
         popupViewController.modalPresentationStyle = .popover
         popupViewController.passedMessage = message
+        popupViewController.calledFrom = "Navigation"
         popupViewController.color = color
         present(popupViewController, animated: true, completion: {print("This is where we could dimiss")})
     }
@@ -156,6 +131,7 @@ class ExploreViewController: UIViewController {
         cancelViewController.modalPresentationStyle = .overCurrentContext
         cancelViewController.passedMessage = explorationCancelationPrompt
         cancelViewController.speechService = speechService
+        cancelViewController.terminationMenuName = "cancelExploration"
         cancelViewController.parentVC = self
         cancelViewController.calledFrom = "Exploration"
         
@@ -354,6 +330,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     

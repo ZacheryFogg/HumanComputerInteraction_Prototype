@@ -16,6 +16,7 @@ class StartViewController: UIViewController {
     
     @IBOutlet var contentView: UIView!
     
+    @IBOutlet var gestureView: UIImageView!
     //04456e darker  UIColor(red: 4/255, green: 69/255, blue: 110/255, alpha: 1.0)
     //1d5578  UIColor(red: 29/255, green: 85/255, blue: 120/255, alpha: 1.0)
     
@@ -23,11 +24,11 @@ class StartViewController: UIViewController {
 //    @IBOutlet var upSwipeMenuImage: UIImageView!
 //    @IBOutlet var upSwipeMenuLabel: UILabel!
     
-    @IBOutlet var leftSwipeMenuImage: UIImageView!
-    @IBOutlet var leftSwipeMenuLabel: UILabel!
-    
-    @IBOutlet var rightSwipeMenuImage: UIImageView!
-    @IBOutlet var rightSwipeMenuLabel: UILabel!
+//    @IBOutlet var leftSwipeMenuImage: UIImageView!
+//    @IBOutlet var leftSwipeMenuLabel: UILabel!
+//
+//    @IBOutlet var rightSwipeMenuImage: UIImageView!
+//    @IBOutlet var rightSwipeMenuLabel: UILabel!
     
 //    @IBOutlet var downSwipeMenuImage: UIImageView!
 //    @IBOutlet var downSwipeMenuLabel: UILabel!
@@ -76,20 +77,22 @@ class StartViewController: UIViewController {
 //        upSwipeMenuLabel.text = "NA"
 //        upSwipeMenuLabel.textColor = .systemBlue
         
-        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
-        leftSwipeMenuImage.tintColor = .white
+//        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
+//        leftSwipeMenuImage.tintColor = .white
+//
+//        leftSwipeMenuLabel.text = "Explore Mode"
+//        leftSwipeMenuLabel.textColor = .white
+//        leftSwipeMenuLabel.textAlignment = .left
+//
+//
+//        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
+//        rightSwipeMenuImage.tintColor = .white
+//
+//        rightSwipeMenuLabel.text = "Navigation Mode"
+//        rightSwipeMenuLabel.textColor = .white
+//        rightSwipeMenuLabel.textAlignment = .right
         
-        leftSwipeMenuLabel.text = "Explore Mode"
-        leftSwipeMenuLabel.textColor = .white
-        leftSwipeMenuLabel.textAlignment = .left
-    
-        
-        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
-        rightSwipeMenuImage.tintColor = .white
-        
-        rightSwipeMenuLabel.text = "Navigation Mode"
-        rightSwipeMenuLabel.textColor = .white
-        rightSwipeMenuLabel.textAlignment = .right
+        gestureView.image = UIImage(named: "startMenu")
         
 //        downSwipeMenuImage.image = UIImage(systemName: "arrow.down")?.withRenderingMode(.alwaysTemplate)
 //        downSwipeMenuLabel.text = "NA"
@@ -207,6 +210,12 @@ class StartViewController: UIViewController {
             self.launchNavigationSession()
         case .Left:
             self.launchExploreSession()
+        case .Down:
+            if let phrase = previousAudioOutputs.last{
+                speechService.say(phrase)
+            } else {
+                speechService.say(noPlayback)
+            }
         default:
             break
             
@@ -275,7 +284,6 @@ extension StartViewController: UIGestureRecognizerDelegate {
         // This logic should be updated later
 //        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -297,6 +305,7 @@ extension StartViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     

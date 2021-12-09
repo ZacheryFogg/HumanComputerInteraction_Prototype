@@ -17,18 +17,7 @@ class NavigationViewController: UIViewController {
     @IBOutlet var navigationInstruction: UILabel!
     @IBOutlet var otherVoiceOutputs: UILabel!
     
-    //    @IBOutlet var upSwipeMenuImage: UIImageView!
-    //    @IBOutlet var upSwipeMenuLabel: UILabel!
-        
-    @IBOutlet var leftSwipeMenuImage: UIImageView!
-    @IBOutlet var leftSwipeMenuLabel: UILabel!
-
-    @IBOutlet var rightSwipeMenuImage: UIImageView!
-    @IBOutlet var rightSwipeMenuLabel: UILabel!
-        
-//        @IBOutlet var downSwipeMenuImage: UIImageView!
-//        @IBOutlet var downSwipeMenuLabel: UILabel!
-    
+    @IBOutlet var gestureMenu: UIImageView!
     
     let voiceOverlayController = VoiceOverlayController()
         
@@ -46,7 +35,7 @@ class NavigationViewController: UIViewController {
     
     var simulationIteration: Int = 0
     
-    var simulationOutputs: [String] = ["Travel east on Cliff Street for 25 meters, toward South Prospect Street",
+    var simulationOutputs: [String] = ["Travel east on Cliff Street for 25 meters towards South Prospect Street",
                                        "Turn left onto South Prospect Street and continue for .25 kilometers",
                                        "You are approaching an intersection between South Prospect Street and Maple Street, with a cross walk in 10 meters. Continue straight.",
                                        "Continue on South Prospect Street for .1 kilometers",
@@ -92,23 +81,8 @@ class NavigationViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationInstruction.text = sampleInstructions.first!
-        otherVoiceOutputs.text = sampleAroundMe.first!
-        
-        leftSwipeMenuImage.image = UIImage(systemName: "arrow.left")?.withRenderingMode(.alwaysTemplate)
-        leftSwipeMenuImage.tintColor = .white
-        
-        leftSwipeMenuLabel.text = "What's Around Me?"
-        leftSwipeMenuLabel.textColor = .white
-        leftSwipeMenuLabel.textAlignment = .left
-    
-        
-        rightSwipeMenuImage.image = UIImage(systemName: "arrow.right")?.withRenderingMode(.alwaysTemplate)
-        rightSwipeMenuImage.tintColor = .white
-        
-        rightSwipeMenuLabel.text = "Where Am I?"
-        rightSwipeMenuLabel.textColor = .white
-        rightSwipeMenuLabel.textAlignment = .right
+//        navigationInstruction.text = sampleInstructions.first!
+//        otherVoiceOutputs.text = sampleAroundMe.first!
         
         navigationInstruction.contentMode = .scaleToFill
         navigationInstruction.numberOfLines = 0
@@ -176,6 +150,8 @@ class NavigationViewController: UIViewController {
         
         otherVoiceOutputContentView.layer.cornerRadius = 10.0
         instructionContentView.layer.cornerRadius = 10.0
+        
+        gestureMenu.image = UIImage(named: "navigationMenu")
         
         
         
@@ -246,7 +222,7 @@ class NavigationViewController: UIViewController {
         }
         
         // Check for cancel
-        let cancelPhrases: [String] = ["cancel", "terminate", "end", "stop"]
+        let cancelPhrases: [String] = ["cancel", "terminat", "end", "stop"]
         
         for phrase in cancelPhrases {
             if (command.contains(phrase)){
@@ -311,6 +287,7 @@ class NavigationViewController: UIViewController {
         cancelViewController.modalPresentationStyle = .overCurrentContext
         cancelViewController.passedMessage = navigationCancelationPrompt
         cancelViewController.speechService = speechService
+        cancelViewController.terminationMenuName = "cancelNavigation"
         cancelViewController.parentVC = self
         cancelViewController.calledFrom = "Navigation"
         
@@ -322,6 +299,7 @@ class NavigationViewController: UIViewController {
         popupViewController.modalTransitionStyle = .coverVertical
         popupViewController.modalPresentationStyle = .popover
         popupViewController.passedMessage = message
+        popupViewController.calledFrom = "Navigation"
         popupViewController.color = color
         present(popupViewController, animated: true, completion: nil)
     }
@@ -334,6 +312,9 @@ class NavigationViewController: UIViewController {
     
     func startNavigationToDestination(destination: String){
         outputInformation(phrase: "Starting navigation to: \(destination)")
+        let instruction = simulationOutputs[simulationIteration]
+        outputInstruction(phrase: instruction)
+        simulationIteration += 1
     }
     
     func terminateFromChild(child: UIViewController){
@@ -364,7 +345,7 @@ extension NavigationViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(error)")
+            print("Error in Dictation: \(String(describing: error))")
         })
     }
     
@@ -450,6 +431,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     

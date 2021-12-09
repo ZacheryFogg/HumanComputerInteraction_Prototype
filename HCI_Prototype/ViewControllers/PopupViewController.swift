@@ -23,11 +23,14 @@ class PopupViewController: UIViewController {
          
     var allowSwipe: Bool = false
     
-    var endingSwipeTranslation: CGPoint!
+    var endingSwipeTranslation = CGPoint(x: 0, y: 0)
     
     let minTravelDistForSwipe: CGFloat = 50.0
     
+    var calledFrom: String!
+    
     var passedMessage: String!
+    
     var color: UIColor!
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,7 +57,10 @@ class PopupViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
-        voiceOverlayController.settings.autoStopTimeout = 3.0
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = ["Confirm Alert", "Help", "Playback"]
+        voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
+        voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
+        voiceOverlayController.settings.autoStopTimeout = 2.0
         
         // Do any additional setup after loading the view.
 //        startDictationButton.backgroundColor = .systemRed
@@ -86,10 +92,55 @@ class PopupViewController: UIViewController {
     }
     
     func interpretValidVoiceCommand(text: String){
-        self.dismiss(animated: true, completion: nil)
+        speechService.stopSpeaking()
+        let command = text.lowercased()
+        
+        // Confirm Termination
+        let confirmPhrases: [String] = ["confirm", "continue"]
+        
+        for phrase in confirmPhrases{
+            if (command.contains(phrase)){
+                dismiss(animated: true, completion: nil)
+                return
+            }
+        }
+        
+        // Check for Help
+        let helpPhrases : [String] = ["help"]
+        
+        for phrase in helpPhrases {
+            if (command.contains(phrase)){
+                speechService.say(alertHelpInstructions)
+                return
+            }
+        }
+        
+        // Check for cancel
+        let cancelPhrases: [String] = ["cancel", "return"]
+        
+        for phrase in cancelPhrases {
+            if (command.contains(phrase)){
+                speechService.say("Returning to \(calledFrom!)")
+                self.dismiss(animated: true, completion: nil)
+                return
+                
+            }
+        }
+        
+        let playbackPhrases: [String] = ["playback", "repeat", "play"]
+    
+        for phrase in playbackPhrases {
+            if (command.contains(phrase)){
+                speechService.stopSpeaking()
+                speechService.say(passedMessage)
+                return
+            }
+        }
+        
+        speechService.say(couldNotInterpretDication)
     }
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-        self.dismiss(animated: true, completion: nil)
+//        self.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -158,10 +209,12 @@ extension PopupViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func singleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         self.dismiss(animated: true, completion: nil)
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     

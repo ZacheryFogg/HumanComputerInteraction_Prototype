@@ -10,7 +10,7 @@ import Foundation
 let appStartInstructions: String =
     """
     Double tap anywhere to start dictation.
-    Say 'Help' to hear the current possible commands and gestures.
+    Dictate - 'Help' - to hear the current possible commands and gestures.
     To use swipe gestures, long press until you feel haptic feedback, and then swipe in the desired direction
     """
 
@@ -25,16 +25,24 @@ let noPlayback: String = "There is no recent audio to playback at this time"
 let navigationCancelationPrompt =
 """
 Are you sure that you want to end your navigation session?
-Gesture upwards or dictate. 'Confirm'. to confirm cancelation.
-Gesture downwards or dictate. 'Return to Navigation'. to return to navigation
+
+
+Gesture upwards or dictate - 'Confirm' - to confirm cancelation.
+
+
+Gesture downwards or dictate - 'Return to Navigation' - to return to navigation
 """
 
 
 let explorationCancelationPrompt =
 """
 Are you sure that you want to end your exploration session?
-Swipe up or dictate: 'Confirm'. To confirm cancelation.
-Swipe down or dictate: 'Return to Exploration'... To return to exploration
+
+
+Swipe up or dictate - 'Confirm' - to confirm cancelation.
+
+
+Swipe down or dictate - 'Return to Exploration' - to return to exploration
 """
 
 
@@ -59,7 +67,7 @@ let navigationHelpInstructions =
 """
 You are currently in an Navigation Session menu.
 You can find out where you are by dictating: "Where am I?", or gesturing right.
-You can here about the significant landmarks in you vicinity by dictating: "What's Around Me?", or gesturing left.
+You can here about the significant landmarks in your vicinity by dictating: "What's Around Me?", or gesturing left.
 You can hear the most recent instruction by dictating: "Playback", or gesturing downwards.
 You can terminate this Navigation session and return to the main menu by dictating: "Terminate Navigation", or gesturing upwards.
 """
@@ -79,7 +87,7 @@ You are currently being prompted to confirm the termination of your:
 let terminationHelpInstructionsP2 =
 """
  session. Gesture upwards or dictate: 'Confirm', to confirm the termination.
-Gesture downwards or dictate: 'Cancel', to cancel the termination and return to you session.
+Gesture downwards or dictate: 'Cancel', to cancel the termination and return to your session.
 """
 
 let selectDestinationInstructions =
@@ -90,4 +98,12 @@ You may dictate your destination, or you may use Voice Over
 functionality to type your destination into the already selected search bar.
 You can also terminate this navigation session by gesturing upwards
 or dictating: 'Terminate Destination Selection'
+"""
+
+let alertHelpInstructions =
+"""
+You have just been notified of an immediate hazard.
+To repeat the alert, gesture downwards or dictate - "Playback".
+To dismiss the alert, short swipe downwards or dictate - "Confirm".
+To hear these instructions again, dictate - "Help"
 """

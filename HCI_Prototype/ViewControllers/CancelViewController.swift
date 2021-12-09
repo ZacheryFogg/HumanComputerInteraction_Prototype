@@ -16,6 +16,8 @@ class CancelViewController: UIViewController {
     
     @IBOutlet var messageLabel: UILabel!
     
+    @IBOutlet var terminationMenu: UIImageView!
+    
     let voiceOverlayController = VoiceOverlayController()
         
     var speechService: SpeechService!
@@ -28,6 +30,7 @@ class CancelViewController: UIViewController {
     
     var passedMessage: String!
     var calledFrom: String!
+    var terminationMenuName: String!
     var parentVC: UIViewController!
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,6 +85,7 @@ class CancelViewController: UIViewController {
         
         messageLabel.contentMode = .scaleToFill
         messageLabel.numberOfLines = 0
+        terminationMenu.image = UIImage(named: terminationMenuName)
         
     }
     
@@ -111,7 +115,7 @@ class CancelViewController: UIViewController {
         let command = text.lowercased()
         
         // Confirm Termination
-        let confirmPhrases: [String] = ["confirm", "continue", "end"]
+        let confirmPhrases: [String] = ["confirm", "continue", "end", "terminate"]
         
         for phrase in confirmPhrases{
             if (command.contains(phrase)){
@@ -220,6 +224,7 @@ extension CancelViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     

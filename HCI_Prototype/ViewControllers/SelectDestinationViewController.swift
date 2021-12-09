@@ -39,6 +39,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     
     var possibleVoiceCommandSet: [String] = [
         "Address of your desired destination",
+        "Terminate Navigation",
         "'Help'"
     ]
     
@@ -46,7 +47,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
      
-        titleLabel.text = "Enter/Dictate Destination, or choose from saved"
+        titleLabel.text = "Select Destination"
         // Configure Search Field
 //        searchField.attributedPlaceholder = NSAttributedString(
 //            string: "Enter or Dictate Search Query",
@@ -62,7 +63,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         
 //        guard UIAccessibility.isVoiceOverRunning else {return}
 //        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-        speechService.say("Enter destination or choose from saved")
+        speechService.say("Enter destination or choose from a saved location")
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,10 +86,10 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         longPressGesture.delegate = self
         self.view.addGestureRecognizer(longPressGesture)
 
-        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler))
-        singleTapGesture.delegate = self
-        singleTapGesture.numberOfTapsRequired = 1
-        self.view.addGestureRecognizer(singleTapGesture)
+//        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler))
+//        singleTapGesture.delegate = self
+//        singleTapGesture.numberOfTapsRequired = 1
+//        self.view.addGestureRecognizer(singleTapGesture)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panHandler))
         panGesture.delegate = self
@@ -105,6 +106,8 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         searchBar.delegate = self
 //        tableView.tableHeaderView?.layer.backgroundColor = CGColor(red: 89/255, green: 4/255, blue: 35/255, alpha: 1.0)
         filteredData = data
+        
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -247,11 +250,11 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         
     }
     
-    @objc func singleTapHandler(sender: UITapGestureRecognizer){
-        speechService.stopSpeaking()
-        let text = "Los Angeles, California"
-        parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
-    }
+//    @objc func singleTapHandler(sender: UITapGestureRecognizer){
+//        speechService.stopSpeaking()
+//        let text = "Los Angeles, California"
+//        parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
+//    }
         
     @objc func panHandler(sender: UIPanGestureRecognizer) {
         // A swipe will only be processed if a long press is also in progress
@@ -263,6 +266,7 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
     }
     
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
+        speechService.stopSpeaking()
         startDictationEvent()
     }
     
@@ -281,7 +285,10 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
-                print("Failed Swipe Gesture: \(endingSwipeTranslation)")
+                print("Just selecting a cell")
+                speechService.stopSpeaking()
+                let text = "Los Angeles, California"
+                parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
             }
             allowSwipe = false
 
