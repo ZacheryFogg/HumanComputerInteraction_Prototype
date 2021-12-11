@@ -103,9 +103,9 @@ let selectDestinationInstructions =
 """
 You are currently being prompted to choose a destination.
 You may dictate your destination, or you may use Voice Over
-functionality to type your destination into the already selected search bar.
+functionality to type your destination into the search bar.
 You can also terminate this navigation session by gesturing upwards
-or dictating: 'Terminate Destination Selection'
+or dictating: 'Terminate Navigation'
 """
 
 let alertHelpInstructions =

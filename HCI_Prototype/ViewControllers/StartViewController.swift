@@ -333,4 +333,10 @@ extension StartViewController: UIGestureRecognizerDelegate {
     }
 }
 
+// Extending UIViewController so that a child view can dismiss itself and its parent (in the case of terminating a session)
+extension UIViewController {
+    func terminateFromChild(child: UIViewController){
+        child.dismiss(animated: true , completion: {self.dismiss(animated: true, completion: nil)})
+    }
+}
 

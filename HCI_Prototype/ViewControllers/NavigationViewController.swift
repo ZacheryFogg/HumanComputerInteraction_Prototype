@@ -311,12 +311,6 @@ class NavigationViewController: UIViewController {
         simulationIteration += 1
     }
     
-    func terminateFromChild(child: UIViewController){
-        child.dismiss(animated: true , completion: nil)
-        self.dismiss(animated: true, completion: nil)
-        self.dismiss(animated: true, completion: nil)
-    }
-    
     func navigationComplete(){
         self.dismiss(animated: true, completion: nil)
         self.dismiss(animated: true, completion: nil)
@@ -457,16 +451,5 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
-}
-
-extension UIViewController {
-    func dismissFromChild(child: UIViewController){
-        child.dismiss(animated: true, completion: nil)
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func dismissChild(child: UIViewController){
-        child.dismiss(animated: true, completion: nil)
     }
 }

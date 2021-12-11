@@ -14,8 +14,6 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
     
-//    @IBOutlet var searchField: UITextField!
-    
     let data = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX",
            "Philadelphia, PA", "Phoenix, AZ", "San Diego, CA", "San Antonio, TX",
            "Dallas, TX", "Detroit, MI", "San Jose, CA", "Indianapolis, IN",
@@ -39,7 +37,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
 
     var possibleVoiceCommandSet: [String] = [
         "Address of your desired destination",
-        "Terminate Navigation",
+        "'Terminate Navigation'",
         "'Help'"
     ]
     
@@ -122,6 +120,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     
     
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
+        
         switch swipeDirection {
         case .Up:
             // User terminates destination selection and goes back to start screen
@@ -132,10 +131,13 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
             } else {
                 speechService.say(noPlayback)
             }
+        case .Left:
+            speechService.say("There is currently no action available on Left Gesture.")
+        case .Right:
+            speechService.say("There is currently no action available on Right Gesture.")
         default:
             break
         }
-        print("Menu swipes here would be handled by Voice Over and that is hard to do on a simulator. So functionality will be assumed")
         
     }
     
@@ -162,7 +164,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         for phrase in cancelPhrases {
             if (command.contains(phrase)){
                 terminate()
-                
+                return
             }
         }
         
@@ -176,7 +178,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
      */
     func terminate(){
         speechService.say("Terminating destination selection. Returning to start screen.")
-        parentVC.dismissFromChild(child: self)
+        self.presentingViewController?.terminateFromChild(child: self)
     }
     
 }

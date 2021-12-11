@@ -14,7 +14,7 @@ class SpeechService {
     var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.2
     
     func say(_ phrase: String) {
-        
+        print("\nSaying: \(phrase)\n")
         if !muted{
             let utterance = AVSpeechUtterance(string: phrase)
             utterance.rate = rate

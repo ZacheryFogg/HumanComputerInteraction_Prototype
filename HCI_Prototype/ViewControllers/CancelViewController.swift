@@ -92,9 +92,6 @@ class CancelViewController: UIViewController {
         switch swipeDirection {
         // Cancelation Confirmed -> Return to Start Menu
         case .Up:
-            
-//            speechService.say("Terminating \(calledFrom!)")
-//            self.presentingViewController?.dismissFromChild()
             terminate()
         // Canceled Cancelation -> Return to Explore Mode
         case .Down:
@@ -151,7 +148,7 @@ class CancelViewController: UIViewController {
     
     func terminate(){
         speechService.say("Terminating \(calledFrom!)")
-        self.presentingViewController?.dismissFromChild(child: self)
+        self.presentingViewController?.terminateFromChild(child: self)
         
     }
     
