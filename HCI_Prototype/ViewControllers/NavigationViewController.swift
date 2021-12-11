@@ -294,12 +294,13 @@ class NavigationViewController: UIViewController {
         present(cancelViewController, animated: true, completion: nil)
     }
     
-    func createAndPresentPopup(color: UIColor, message: String) {
+    func createAndPresentPopup(color: UIColor, message: String, helpInstructions: String) {
         let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
         popupViewController.modalTransitionStyle = .coverVertical
         popupViewController.modalPresentationStyle = .overCurrentContext
         popupViewController.speechService = speechService
         popupViewController.passedMessage = message
+        popupViewController.helpInstructions = helpInstructions
         popupViewController.calledFrom = "Navigation"
         popupViewController.color = color
         present(popupViewController, animated: true, completion: nil)
@@ -398,21 +399,21 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
                     outputInstruction(phrase: phrase)
                     
                 } else {
-                    createAndPresentPopup(color: UIColor(red: 255/255, green: 83/255.0, blue: 100/255.0, alpha: 1.0), message: "Alert! There is a large object obstructing your path in 5 meters!")
+                    createAndPresentPopup(color: UIColor(red: 255/255, green: 83/255.0, blue: 100/255.0, alpha: 1.0), message: "Alert! There is a large object obstructing your path in 5 meters!", helpInstructions: alertHelpInstructions)
                 }
                 
                 simulationIteration += 1
             } else if simulationIteration == simulationOutputs.count{
                 simulationIteration += 1
-                createAndPresentPopup(color: greenColor, message: "You are within 5 meters of the entrance to Lafayatte Hall. Please slowly pan your phone to your left until the entrance is detected")
+                createAndPresentPopup(color: greenColor, message: "You are within 5 meters of the entrance to Lafayatte Hall. Please slowly pan your phone to your left until the entrance is detected", helpInstructions: notificationHelpInstructions )
                 
 
                 
             } else if simulationIteration == simulationOutputs.count + 1 {
                 simulationIteration += 1
-                createAndPresentPopup(color: greenColor, message: "Entrance detected. Travel straight for 3 meters and the entrance will be directly in front of you")
+                createAndPresentPopup(color: greenColor, message: "Entrance detected. Travel straight for 3 meters and the entrance will be directly in front of you", helpInstructions: notificationHelpInstructions )
             } else if simulationIteration == simulationOutputs.count + 2{
-                createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete")
+                createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete", helpInstructions: notificationHelpInstructions )
                 navigationComplete()
             }
         }

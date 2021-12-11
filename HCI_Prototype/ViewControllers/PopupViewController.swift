@@ -27,6 +27,8 @@ class PopupViewController: UIViewController {
     
     var passedMessage: String!
     
+    var helpInstructions: String!
+    
     var color: UIColor!
     
     var speechService: SpeechService!
@@ -96,7 +98,7 @@ class PopupViewController: UIViewController {
         let helpPhrases : [String] = ["help"]
         for phrase in helpPhrases {
             if (command.contains(phrase)){
-                speechService.say(alertHelpInstructions)
+                speechService.say(self.helpInstructions!)
                 return
             }
         }

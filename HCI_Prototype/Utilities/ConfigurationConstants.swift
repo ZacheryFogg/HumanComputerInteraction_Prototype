@@ -118,6 +118,15 @@ To dismiss the alert, gesture upwards or dictate - "Confirm".
 To hear these instructions again, dictate - "Help"
 """
 
+let notificationHelpInstructions  =
+
+"""
+You are within meters of your destination and have just been instructed
+on how to proceed. To repeat the instructions, gesture downwards or dictate - "Playback".
+To dismiss the instructions, gesture upwards or dictate - "Confirm".
+Dictate - "Help" - to hear this message again.
+"""
+
 let selectDestinationStartInstruction = "Dictate or enter a destination or choose from a previously saved location."
 
 let noActionOnUp = "There is not any action currently associated with the upwards gesture."

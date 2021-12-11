@@ -92,14 +92,15 @@ class ExploreViewController: UIViewController {
         
     }
             
-    func createAndPresentPopup(color: UIColor, message: String) {
+    func createAndPresentPopup(color: UIColor, message: String, helpInstructions: String) {
         let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
         popupViewController.modalTransitionStyle = .coverVertical
         popupViewController.modalPresentationStyle = .popover
+        popupViewController.helpInstructions = helpInstructions
         popupViewController.passedMessage = message
         popupViewController.calledFrom = "Navigation"
         popupViewController.color = color
-        present(popupViewController, animated: true, completion: {print("This is where we could dimiss")})
+        present(popupViewController, animated: true, completion: {})
     }
     
     func promptCancelExploration(){
