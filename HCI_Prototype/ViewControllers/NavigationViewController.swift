@@ -10,29 +10,25 @@ import InstantSearchVoiceOverlay
 
 class NavigationViewController: UIViewController {
     
+    
+    // Outlets for storyboard elements
     @IBOutlet var instructionContentView: UIView!
     @IBOutlet var otherVoiceOutputContentView: UIView!
-    
-    // Outlets
     @IBOutlet var navigationInstruction: UILabel!
     @IBOutlet var otherVoiceOutputs: UILabel!
-    
     @IBOutlet var gestureMenu: UIImageView!
-    
+
+    // UI
     let voiceOverlayController = VoiceOverlayController()
-        
+    
     var speechService: SpeechService!
          
     var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
-    
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
+        
     var allowSwipe: Bool = false
     
     var previousAudioOutputs: [String] = []
-    
-    var previousNavigationInstructions: [String] = []
-    
+        
     var simulationIteration: Int = 0
     
     var simulationOutputs: [String] = ["Travel east on Cliff Street for 25 meters towards South Prospect Street",
@@ -63,7 +59,7 @@ class NavigationViewController: UIViewController {
         "Continue along X for Y",
         "Take an X on Y in Z meters",
         "Continue along A for B meters",
-        "In X meters, your destination will be on you Y"
+        "In X meters, your destination will be on your Y"
     ]
     
     var sampleWhereAmI: [String] = [
@@ -106,7 +102,7 @@ class NavigationViewController: UIViewController {
     func presentChooseDestinationView(){
         let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SelectDestinationViewController") as! SelectDestinationViewController
         destinationViewController.modalTransitionStyle = .coverVertical
-        destinationViewController.modalPresentationStyle = .popover
+        destinationViewController.modalPresentationStyle = .overCurrentContext
         destinationViewController.parentVC = self
         destinationViewController.speechService = speechService
         present(destinationViewController, animated: true, completion: nil)
@@ -152,8 +148,6 @@ class NavigationViewController: UIViewController {
         instructionContentView.layer.cornerRadius = 10.0
         
         gestureMenu.image = UIImage(named: "navigationMenu")
-        
-        
         
         
     }

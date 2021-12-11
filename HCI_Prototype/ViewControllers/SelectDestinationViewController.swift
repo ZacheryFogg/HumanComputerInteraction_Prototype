@@ -27,16 +27,16 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         
     var speechService: SpeechService!
          
-    var allowSwipe: Bool = false
+    var allowSwipe: Bool = false // This will be set to true once a user long presses to simulate the haptic touch menu
     
-    var endingSwipeTranslation = CGPoint(x: 0, y:0)
-    
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
+    var endingSwipeTranslation = CGPoint(x: 0, y:0) // Track how a user swipes to determine direction
+        
     var filteredData: [String]!
     
     var parentVC: NavigationViewController!
     
+    var previousAudioOutputs: [String] = []
+
     var possibleVoiceCommandSet: [String] = [
         "Address of your desired destination",
         "Terminate Navigation",
@@ -46,29 +46,18 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-     
-        titleLabel.text = "Select Destination"
-        // Configure Search Field
-//        searchField.attributedPlaceholder = NSAttributedString(
-//            string: "Enter or Dictate Search Query",
-//            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-//        )
-//
-//        searchField.layer.cornerRadius = 5.0
-    
+        titleLabel.text = "Destination Selection"
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        speechService.say(selectDestinationStartInstruction)
+        previousAudioOutputs.append(selectDestinationStartInstruction)
         
-//        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-        speechService.say("Enter destination or choose from a saved location")
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         
         self.view.isUserInteractionEnabled = true
         self.view.isMultipleTouchEnabled = true
@@ -82,14 +71,10 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
         voiceOverlayController.settings.autoStopTimeout = 2.0
         
+        // Attacking gesture recognizers to the view
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         longPressGesture.delegate = self
         self.view.addGestureRecognizer(longPressGesture)
-
-//        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler))
-//        singleTapGesture.delegate = self
-//        singleTapGesture.numberOfTapsRequired = 1
-//        self.view.addGestureRecognizer(singleTapGesture)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panHandler))
         panGesture.delegate = self
@@ -100,16 +85,16 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         doubleTapGesture.numberOfTapsRequired = 2
         self.view.addGestureRecognizer(doubleTapGesture)
         
-        // Search Bar Stuff
-
+        // Search bar Configuration
         tableView.dataSource = self
         searchBar.delegate = self
-//        tableView.tableHeaderView?.layer.backgroundColor = CGColor(red: 89/255, green: 4/255, blue: 35/255, alpha: 1.0)
         filteredData = data
-        
         
     }
     
+    /*
+     Create cells for each item in the dataSource and populate the table view them
+     */
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
 
@@ -117,31 +102,21 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         cell.textLabel?.textColor = .white
         cell.textLabel?.text = filteredData[indexPath.row]
         return cell
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "TableCell", for: indexPath) as UITableViewCell
-//        cell.textLabel?.text = filteredData[indexPath.row]
-//        return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return filteredData.count
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
-          print("You selected cell #\(indexPath.row)!")
-
-      }
-    
+    /*
+     Respond to changes in the search bar status to filter data
+     */
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            // When there is no text, filteredData is the same as the original data
-            // When user has entered text into the search box
-            // Use the filter method to iterate over all items in the data array
-            // For each item, return true if the item should be included and false if the
-            // item should NOT be included
+
             filteredData = searchText.isEmpty ? data : data.filter { (item: String) -> Bool in
                 // If dataItem matches the searchText, return true to include it
                 return item.range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil
             }
-            
             tableView.reloadData()
         }
     
@@ -152,7 +127,11 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
             // User terminates destination selection and goes back to start screen
             terminate()
         case .Down:
-            print("Possibly add recent playback functionality")
+            if let phrase = previousAudioOutputs.last{
+                speechService.say(phrase)
+            } else {
+                speechService.say(noPlayback)
+            }
         default:
             break
         }
@@ -160,11 +139,14 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         
     }
     
+    /*
+     Try and parse voice input to match some primitive commands
+     */
     func interpretValidVoiceCommand(text: String){
         speechService.stopSpeaking()
+        
         let command = text.lowercased()
         
-       
         // Check for Help
         let helpPhrases : [String] = ["help"]
         
@@ -184,18 +166,24 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
             }
         }
         
+        // If the user did not ask for help or to terminate the view, then
+        // we will assume that the input is valid as we have no backend
         parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
     }
     
+    /*
+     Terminate session and return to start menu
+     */
     func terminate(){
         speechService.say("Terminating destination selection. Returning to start screen.")
-//        self.presentingViewController?.dismissFromChild()
         parentVC.dismissFromChild(child: self)
     }
     
 }
 
-
+/*
+ Make this view a delegate for the voice overlay controller so that it can recieve voice command events
+ */
 extension SelectDestinationViewController: VoiceOverlayDelegate {
     
     func startDictationEvent() {
@@ -250,12 +238,9 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         
     }
     
-//    @objc func singleTapHandler(sender: UITapGestureRecognizer){
-//        speechService.stopSpeaking()
-//        let text = "Los Angeles, California"
-//        parentVC.retrieveDestinationAndTerminateChild(child: self, destination: text)
-//    }
-        
+    /*
+     This is the second component of a "gesture" where the user has long pressed and will now "swipe" in a direction
+     */
     @objc func panHandler(sender: UIPanGestureRecognizer) {
         // A swipe will only be processed if a long press is also in progress
         if allowSwipe{
@@ -265,6 +250,7 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         }
     }
     
+    /* A double tap will always start a dictation event in any view*/
     @objc func doubleTapHandler(sender: UITapGestureRecognizer) {
         speechService.stopSpeaking()
         startDictationEvent()
@@ -285,6 +271,8 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
                     print("Undetermined Swipe Direction")
                 }
             } else {
+                // This is a special hardcoded case where we just want to pretend that the user used VoiceOver to select one of the destinations
+                // represented by a cell... here we just always navigate to Los Angeles
                 print("Just selecting a cell")
                 speechService.stopSpeaking()
                 let text = "Los Angeles, California"

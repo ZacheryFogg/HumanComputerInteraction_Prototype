@@ -24,9 +24,7 @@ class PopupViewController: UIViewController {
     var allowSwipe: Bool = false
     
     var endingSwipeTranslation = CGPoint(x: 0, y: 0)
-    
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
+        
     var calledFrom: String!
     
     var passedMessage: String!

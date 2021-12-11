@@ -23,9 +23,7 @@ class ExploreViewController: UIViewController {
     var allowSwipe: Bool = false
     
     var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
-    
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
+        
     var previousAudioOutputs: [String] = []
     
     var possibleVoiceCommandSet: [String] = [

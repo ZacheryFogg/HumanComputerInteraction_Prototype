@@ -1,11 +1,19 @@
 //
-//  SpeechServicePhrases.swift
+//  ConfigurationConstants.swift
 //  HCI_Prototype
 //
 //  Created by Zach Fogg on 12/7/21.
 //
 
 import Foundation
+import UIKit
+
+// Constants
+
+let minTravelDistForSwipe: CGFloat = 50.0
+
+
+// Configuration for Audio Feedback
 
 let appStartInstructions: String =
     """
@@ -107,3 +115,5 @@ To repeat the alert, gesture downwards or dictate - "Playback".
 To dismiss the alert, short swipe downwards or dictate - "Confirm".
 To hear these instructions again, dictate - "Help"
 """
+
+let selectDestinationStartInstruction = "Dictate or enter a destination or choose from a previously saved location"

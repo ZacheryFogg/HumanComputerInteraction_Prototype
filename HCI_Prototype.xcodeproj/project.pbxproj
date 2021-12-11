@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		6F0C318D275EBBB0001FE775 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0C318C275EBBB0001FE775 /* SpeechService.swift */; };
 		6F2DC0F0275F9EAB00292290 /* AccessibilityInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0EF275F9EAB00292290 /* AccessibilityInformation.swift */; };
-		6F2DC0F2275F9F0A00292290 /* SpeechServicePhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0F1275F9F0A00292290 /* SpeechServicePhrases.swift */; };
+		6F2DC0F2275F9F0A00292290 /* ConfigurationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0F1275F9F0A00292290 /* ConfigurationConstants.swift */; };
 		6F2DC0F4275FD04500292290 /* ExploreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0F3275FD04500292290 /* ExploreViewController.swift */; };
 		6F2DC0F9275FDBBB00292290 /* CancelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0F8275FDBBB00292290 /* CancelViewController.swift */; };
 		6F2DC0FB275FDC7000292290 /* NavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2DC0FA275FDC7000292290 /* NavigationViewController.swift */; };
@@ -45,7 +45,7 @@
 		1AC6FC53A6E066803D00F23F /* Pods-HCI_Prototype.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HCI_Prototype.release.xcconfig"; path = "Target Support Files/Pods-HCI_Prototype/Pods-HCI_Prototype.release.xcconfig"; sourceTree = "<group>"; };
 		6F0C318C275EBBB0001FE775 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		6F2DC0EF275F9EAB00292290 /* AccessibilityInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityInformation.swift; sourceTree = "<group>"; };
-		6F2DC0F1275F9F0A00292290 /* SpeechServicePhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechServicePhrases.swift; sourceTree = "<group>"; };
+		6F2DC0F1275F9F0A00292290 /* ConfigurationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationConstants.swift; sourceTree = "<group>"; };
 		6F2DC0F3275FD04500292290 /* ExploreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewController.swift; sourceTree = "<group>"; };
 		6F2DC0F8275FDBBB00292290 /* CancelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelViewController.swift; sourceTree = "<group>"; };
 		6F2DC0FA275FDC7000292290 /* NavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewController.swift; sourceTree = "<group>"; };
@@ -124,7 +124,7 @@
 		6F2DC0F7275FDB5C00292290 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				6F2DC0F1275F9F0A00292290 /* SpeechServicePhrases.swift */,
+				6F2DC0F1275F9F0A00292290 /* ConfigurationConstants.swift */,
 				6F2DC0EF275F9EAB00292290 /* AccessibilityInformation.swift */,
 				6F0C318C275EBBB0001FE775 /* SpeechService.swift */,
 			);
@@ -349,7 +349,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F2DC0F2275F9F0A00292290 /* SpeechServicePhrases.swift in Sources */,
+				6F2DC0F2275F9F0A00292290 /* ConfigurationConstants.swift in Sources */,
 				6F3FBD51273B295300657367 /* StartViewController.swift in Sources */,
 				6F2DC0F9275FDBBB00292290 /* CancelViewController.swift in Sources */,
 				6F2DC0FB275FDC7000292290 /* NavigationViewController.swift in Sources */,

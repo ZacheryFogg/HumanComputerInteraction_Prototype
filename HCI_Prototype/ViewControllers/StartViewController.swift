@@ -48,8 +48,6 @@ class StartViewController: UIViewController {
     
     var endingSwipeTranslation: CGPoint = CGPoint(x: 0.0, y: 0.0)
     
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
     var possibleVoiceCommandSet: [String] = [
         "'Start Navigation'",
         "'Start Exploration'",
@@ -59,11 +57,6 @@ class StartViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-//        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
-//        speechService.say("Start Menu View")
-
         speechService.say(appStartInstructions)
         previousAudioOutputs.append(appStartInstructions)
         
@@ -106,7 +99,7 @@ class StartViewController: UIViewController {
         self.view.isUserInteractionEnabled = true
         self.view.isMultipleTouchEnabled = true
         
-        speechService.muted = false
+        speechService.muted = true
         // Preconfigure voiceOverlayController
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true

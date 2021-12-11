@@ -9,7 +9,7 @@ import AVFoundation
 
 class SpeechService {
     
-    public var muted: Bool = false
+    public var muted: Bool = true
     private let synthesizer = AVSpeechSynthesizer()
     var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.2
     

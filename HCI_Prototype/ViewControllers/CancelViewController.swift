@@ -25,9 +25,7 @@ class CancelViewController: UIViewController {
     var allowSwipe: Bool = false
     
     var endingSwipeTranslation = CGPoint(x: 0.0, y: 0.0)
-    
-    let minTravelDistForSwipe: CGFloat = 50.0
-    
+        
     var passedMessage: String!
     var calledFrom: String!
     var terminationMenuName: String!
