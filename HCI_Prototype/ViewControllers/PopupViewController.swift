@@ -136,6 +136,7 @@ class PopupViewController: UIViewController {
         speechService.say(passedMessage)
     }
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
+        speechService.stopSpeaking()
         switch swipeDirection {
         case .Up:
             confirmMessage()
@@ -192,7 +193,6 @@ extension PopupViewController: UIGestureRecognizerDelegate {
         let downEnd = rightStart - 0.01
         
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -228,6 +228,7 @@ extension PopupViewController: UIGestureRecognizerDelegate {
         switch gestureRecognizer.state {
         case .began:
             print("vibrate")
+            endingSwipeTranslation = CGPoint(x: 0, y: 0)
             allowSwipe = true
         case .ended:
             if (abs(endingSwipeTranslation.x) >= minTravelDistForSwipe || abs(endingSwipeTranslation.y) >= minTravelDistForSwipe){

@@ -131,7 +131,7 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
     
     
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-        
+        speechService.stopSpeaking()
         switch swipeDirection {
         case .Up:
             // User terminates destination selection and goes back to start screen
@@ -272,6 +272,7 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         switch gestureRecognizer.state {
         case .began:
             print("vibrate")
+            endingSwipeTranslation = CGPoint(x: 0, y: 0)
             allowSwipe = true
         case .ended:
             if (abs(endingSwipeTranslation.x) >= minTravelDistForSwipe || abs(endingSwipeTranslation.y) >= minTravelDistForSwipe){

@@ -136,8 +136,8 @@ class NavigationViewController: UIViewController {
         navigationInstruction.isAccessibilityElement = true
         navigationInstruction.accessibilityHint = "Current navigation instruction"
         
-        otherVoiceOutputs.layer.isAccessibilityElement = true
-        otherVoiceOutputs.layer.accessibilityHint = "Most recent audio output"
+        otherVoiceOutputs.isAccessibilityElement = true
+        otherVoiceOutputs.accessibilityHint = "Most recent audio output"
         
         gestureMenu.image = UIImage(named: "navigationMenu")
         
@@ -319,7 +319,7 @@ class NavigationViewController: UIViewController {
     }
     
     func navigationComplete(){
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {self.dismiss(animated: true, completion: {self.dismiss(animated: true, completion: nil)})})
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {self.dismiss(animated: true, completion: {self.dismiss(animated: true, completion: nil)})})
     }
     
   
@@ -428,6 +428,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
         switch gestureRecognizer.state {
         case .began:
             print("vibrate")
+            endingSwipeTranslation = CGPoint(x: 0, y: 0)
             allowSwipe = true
         case .ended:
             if (abs(endingSwipeTranslation.x) >= minTravelDistForSwipe || abs(endingSwipeTranslation.y) >= minTravelDistForSwipe){

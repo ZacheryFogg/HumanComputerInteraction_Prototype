@@ -307,6 +307,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
         switch gestureRecognizer.state {
         case .began:
             print("vibrate")
+            endingSwipeTranslation = CGPoint(x: 0, y: 0)
             allowSwipe = true
         case .ended:
             if (abs(endingSwipeTranslation.x) >= minTravelDistForSwipe || abs(endingSwipeTranslation.y) >= minTravelDistForSwipe){
