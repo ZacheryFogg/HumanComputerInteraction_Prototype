@@ -1,5 +1,7 @@
 # HumanComputerInteraction_Prototype
 
+Final Project for CS 228: Human Computer Interaction
+
 Instructions for using UI: 
 
 Although the audio output will instruct you on this upon UI startup: 
