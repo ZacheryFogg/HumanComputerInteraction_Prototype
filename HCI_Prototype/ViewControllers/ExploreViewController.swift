@@ -37,18 +37,17 @@ class ExploreViewController: UIViewController {
     var sampleWhereAmI: [String] = [
         "You are approaching the intersection of X and Y",
         "You are X and Y",
+        "You are everywhere and nowhere"
     ]
     
     var sampleAroundMe: [String] = [
         "I am to your left. You are to my right",
+        "Nothing is around you, you exist in a void"
     
     ]
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-//        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
         speechService.say("Exploration Session Started")
         
     }
@@ -66,13 +65,6 @@ class ExploreViewController: UIViewController {
         voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
         voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
         voiceOverlayController.settings.autoStopTimeout = 2.0
-        
-        // Do any additional setup after loading the view.
-//        startDictationButton.backgroundColor = .systemRed
-//        startDictationButton.setTitleColor(.white, for: .normal)
-//
-//        startDictationButton.isAccessibilityElement = true
-//        startDictationButton.accessibilityHint = "Pressing this button start a process to listen for a voice command"
         
         // Add gesture recognizers to view
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -93,25 +85,13 @@ class ExploreViewController: UIViewController {
         audioOutputLabel.contentMode = .scaleToFill
         audioOutputLabel.numberOfLines = 0
         
+        audioOutputLabel.isAccessibilityElement = true
+        audioOutputLabel.accessibilityHint = "Most recent audio output"
+        
         explorationMenu.image = UIImage(named: "explorationMenu")
         
     }
-    
-
-    
-    func simulate() {
-        let seconds = 3.0
-//        await Task.sleep(UInt64(seconds * Double(NSEC_PER_SEC)))
-        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-            self.createAndPresentPopup(color: UIColor.systemRed, message: "This is a very important Alert")
-//            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-//                self.createAndPresentPopup(color: UIColor.systemBlue, message: "This is a very important Alert")
-//            }
-        }
-        
-        
-    }
-    
+            
     func createAndPresentPopup(color: UIColor, message: String) {
         let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
         popupViewController.modalTransitionStyle = .coverVertical
@@ -268,19 +248,12 @@ extension ExploreViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(error)")
+            print("Error in Dictation: \(error!)")
         })
     }
     
     func recording(text: String?, final: Bool?, error: Error?) {
         return
-    }
-    
-    /*
-    When a user has finished dictating a command, interpret it and perform the desired action
-     */
-    func interpretValidVoiceCommand(command: String){
-        
     }
 }
 
@@ -303,10 +276,7 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
         let downStart = leftEnd + 0.01
         let downEnd = rightStart - 0.01
         
-        // This logic should be updated later
-//        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
-//        print(angle)
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
         if angle >= upStart && angle <= upEnd { return SwipeDirection.Up}
@@ -360,18 +330,6 @@ extension ExploreViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if (segue.identifier == "ConfirmCancelationExplore"){
-            var messageToPass = "Passed Message"
-            
-            let destinationVC = segue.destination as! CancelViewController
-            destinationVC.passedMessage = messageToPass
-        }
-        else {
-            print("Not Cancellation Seque")
-        }
     }
 }
 

@@ -18,8 +18,6 @@ class PopupViewController: UIViewController {
     @IBOutlet var messageLabel: UILabel!
     
     let voiceOverlayController = VoiceOverlayController()
-        
-    let speechService = SpeechService()
          
     var allowSwipe: Bool = false
     
@@ -31,6 +29,8 @@ class PopupViewController: UIViewController {
     
     var color: UIColor!
     
+    var speechService: SpeechService!
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         messageLabel.text = passedMessage
@@ -40,9 +40,6 @@ class PopupViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-//        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Voices in my head again, trapped in a war inside my own skin. They. Are. Pulling. Me ... under!")
         speechService.say(passedMessage)
     }
     override func viewDidLoad() {
@@ -55,30 +52,21 @@ class PopupViewController: UIViewController {
         voiceOverlayController.delegate = self
         voiceOverlayController.settings.autoStart = true
         voiceOverlayController.settings.autoStop = true
-        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = ["Confirm Alert", "Help", "Playback"]
+        voiceOverlayController.settings.layout.inputScreen.subtitleBulletList = ["Confirm Message", "Help", "Playback"]
         voiceOverlayController.settings.layout.inputScreen.subtitleInitial = "Current Possible Commands"
         voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
         voiceOverlayController.settings.autoStopTimeout = 2.0
         
-        // Do any additional setup after loading the view.
-//        startDictationButton.backgroundColor = .systemRed
-//        startDictationButton.setTitleColor(.white, for: .normal)x
-//
-//        startDictationButton.isAccessibilityElement = true
-//        startDictationButton.accessibilityHint = "Pressing this button start a process to listen for a voice command"
         
         // Add gesture recognizers to view
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         longPressGesture.delegate = self
         self.view.addGestureRecognizer(longPressGesture)
 
-        
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panHandler))
         panGesture.delegate = self
         self.view.addGestureRecognizer(panGesture)
-        
-         
-        
+                
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler))
         doubleTapGesture.delegate = self
         doubleTapGesture.numberOfTapsRequired = 2
@@ -87,6 +75,8 @@ class PopupViewController: UIViewController {
         messageLabel.contentMode = .scaleToFill
         messageLabel.numberOfLines = 0
         
+        messageLabel.isAccessibilityElement = true
+        messageLabel.accessibilityHint = "Message notification"
     }
     
     func interpretValidVoiceCommand(text: String){
@@ -95,17 +85,15 @@ class PopupViewController: UIViewController {
         
         // Confirm Termination
         let confirmPhrases: [String] = ["confirm", "continue"]
-        
         for phrase in confirmPhrases{
             if (command.contains(phrase)){
-                dismiss(animated: true, completion: nil)
+                confirmMessage()
                 return
             }
         }
         
         // Check for Help
         let helpPhrases : [String] = ["help"]
-        
         for phrase in helpPhrases {
             if (command.contains(phrase)){
                 speechService.say(alertHelpInstructions)
@@ -113,32 +101,53 @@ class PopupViewController: UIViewController {
             }
         }
         
-        // Check for cancel
+        // Check for Return
         let cancelPhrases: [String] = ["cancel", "return"]
-        
         for phrase in cancelPhrases {
             if (command.contains(phrase)){
                 speechService.say("Returning to \(calledFrom!)")
                 self.dismiss(animated: true, completion: nil)
                 return
-                
             }
         }
         
+        // Check for Playback
         let playbackPhrases: [String] = ["playback", "repeat", "play"]
-    
         for phrase in playbackPhrases {
             if (command.contains(phrase)){
-                speechService.stopSpeaking()
-                speechService.say(passedMessage)
+                playbackRecent()
                 return
             }
         }
         
+        // If reaches this point, then command was not able to be matched to an action
         speechService.say(couldNotInterpretDication)
     }
+    
+    // User acknowledged the message
+    func confirmMessage(){
+        speechService.say("You acknowledged this message. Returning to \(calledFrom!)")
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    // User wa
+    func playbackRecent(){
+        speechService.stopSpeaking()
+        speechService.say(passedMessage)
+    }
     func interpretValidMenuSwipe(swipeDirection: SwipeDirection){
-//        self.dismiss(animated: true, completion: nil)
+        switch swipeDirection {
+        case .Up:
+            confirmMessage()
+        case .Down:
+            playbackRecent()
+        case .Left:
+            speechService.say(noActionOnLeft)
+        case .Right:
+            speechService.say(noActionOnRight)
+        case .Undetermined:
+            break
+        }
     }
 }
 
@@ -154,7 +163,7 @@ extension PopupViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(error)")
+            print("Error in Dictation: \(error!)")
         })
     }
     
@@ -182,8 +191,6 @@ extension PopupViewController: UIGestureRecognizerDelegate {
         let downStart = leftEnd + 0.01
         let downEnd = rightStart - 0.01
         
-        // This logic should be updated later
-//        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
         print(angle)
         

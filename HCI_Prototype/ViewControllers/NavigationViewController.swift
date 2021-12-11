@@ -28,6 +28,7 @@ class NavigationViewController: UIViewController {
     var allowSwipe: Bool = false
     
     var previousAudioOutputs: [String] = []
+    var previousNavigationInstructions: [String] = [] // This is to track only the previous instructions
         
     var simulationIteration: Int = 0
     
@@ -52,33 +53,22 @@ class NavigationViewController: UIViewController {
         "'Where Am I?'",
         "'Terminate navigation'",
         "'Playback most recent audio'",
+        "'Current instruction'",
         "'Help'"
     ]
-    
-    var sampleInstructions: [String] = [
-        "Continue along X for Y",
-        "Take an X on Y in Z meters",
-        "Continue along A for B meters",
-        "In X meters, your destination will be on your Y"
-    ]
-    
+        
     var sampleWhereAmI: [String] = [
         "You are approaching the intersection of X and Y",
         "You are X and Y",
-        "I am at your dear mother's house"
     ]
     
     var sampleAroundMe: [String] = [
         "I am to your left. You are to my right",
-        "10 meters in front of you is the entrance to your mother",
-        "I am 10 meters behind your mom"
-    
+        "Nothing is around you, you exist in a void",
     ]
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-//        navigationInstruction.text = sampleInstructions.first!
-//        otherVoiceOutputs.text = sampleAroundMe.first!
         
         navigationInstruction.contentMode = .scaleToFill
         navigationInstruction.numberOfLines = 0
@@ -92,10 +82,6 @@ class NavigationViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-//        guard UIAccessibility.isVoiceOverRunning else {return}
-//        speechService.say("Navigation Session Started to: \(location)")
-//        speechService.say("The destination is: \(currentDistanceRemaining) kilometers away")
-//        speechService.say("The journey should take: \(currentTimeRemaining)")
         presentChooseDestinationView()
     }
     
@@ -146,6 +132,12 @@ class NavigationViewController: UIViewController {
         
         otherVoiceOutputContentView.layer.cornerRadius = 10.0
         instructionContentView.layer.cornerRadius = 10.0
+        
+        navigationInstruction.isAccessibilityElement = true
+        navigationInstruction.accessibilityHint = "Current navigation instruction"
+        
+        otherVoiceOutputs.layer.isAccessibilityElement = true
+        otherVoiceOutputs.layer.accessibilityHint = "Most recent audio output"
         
         gestureMenu.image = UIImage(named: "navigationMenu")
         
@@ -225,6 +217,19 @@ class NavigationViewController: UIViewController {
             }
         }
         
+        // Check for playback most recent instructuon
+        let instructionPhrases: [String] = ["instruction", "direction", "current"]
+        
+        for phrase in instructionPhrases {
+            if (command.contains(phrase)){
+                if let instruction = previousNavigationInstructions.last{
+                    speechService.say(instruction)
+                    previousAudioOutputs.append(instruction)
+                }
+                return
+            }
+        }
+        
         
         // Check for Playback
         let playbackPhrases : [String] = ["playback", "play back", "repeat", "play"]
@@ -250,6 +255,7 @@ class NavigationViewController: UIViewController {
     func outputInstruction(phrase: String){
         speechService.say(phrase)
         previousAudioOutputs.append(phrase)
+        previousNavigationInstructions.append(phrase)
         navigationInstruction.text = phrase
     }
     
@@ -291,7 +297,8 @@ class NavigationViewController: UIViewController {
     func createAndPresentPopup(color: UIColor, message: String) {
         let popupViewController = self.storyboard?.instantiateViewController(withIdentifier: "PopupViewController") as! PopupViewController
         popupViewController.modalTransitionStyle = .coverVertical
-        popupViewController.modalPresentationStyle = .popover
+        popupViewController.modalPresentationStyle = .overCurrentContext
+        popupViewController.speechService = speechService
         popupViewController.passedMessage = message
         popupViewController.calledFrom = "Navigation"
         popupViewController.color = color
@@ -312,9 +319,7 @@ class NavigationViewController: UIViewController {
     }
     
     func navigationComplete(){
-        self.dismiss(animated: true, completion: nil)
-        self.dismiss(animated: true, completion: nil)
-        dismiss(animated: true, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {self.dismiss(animated: true, completion: {self.dismiss(animated: true, completion: nil)})})
     }
     
   
@@ -333,7 +338,7 @@ extension NavigationViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(String(describing: error))")
+            print("Error in Dictation: \(error!)")
         })
     }
     
@@ -361,9 +366,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
         
         let downStart = leftEnd + 0.01
         let downEnd = rightStart - 0.01
-        
-        // This logic should be updated later
-//        print("End: \(endPoint)")
+
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
@@ -410,9 +413,6 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
                 createAndPresentPopup(color: greenColor, message: "Entrance detected. Travel straight for 3 meters and the entrance will be directly in front of you")
             } else if simulationIteration == simulationOutputs.count + 2{
                 createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete")
-                simulationIteration += 1
-                
-            } else {
                 navigationComplete()
             }
         }

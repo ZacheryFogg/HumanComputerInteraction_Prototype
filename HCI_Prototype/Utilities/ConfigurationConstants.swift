@@ -17,6 +17,7 @@ let minTravelDistForSwipe: CGFloat = 50.0
 
 let appStartInstructions: String =
     """
+    You are currently on the start menu.
     Double tap anywhere to start dictation.
     Dictate - 'Help' - to hear the current possible commands and gestures.
     To use swipe gestures, long press until you feel haptic feedback, and then swipe in the desired direction
@@ -76,7 +77,8 @@ let navigationHelpInstructions =
 You are currently in an Navigation Session menu.
 You can find out where you are by dictating: "Where am I?", or gesturing right.
 You can here about the significant landmarks in your vicinity by dictating: "What's Around Me?", or gesturing left.
-You can hear the most recent instruction by dictating: "Playback", or gesturing downwards.
+You can hear the most recent audio output by dictating: "Playback", or gesturing downwards.
+You can hear the current navigation instruction by dictating: "Current Instruction".
 You can terminate this Navigation session and return to the main menu by dictating: "Terminate Navigation", or gesturing upwards.
 """
 
@@ -112,8 +114,12 @@ let alertHelpInstructions =
 """
 You have just been notified of an immediate hazard.
 To repeat the alert, gesture downwards or dictate - "Playback".
-To dismiss the alert, short swipe downwards or dictate - "Confirm".
+To dismiss the alert, gesture upwards or dictate - "Confirm".
 To hear these instructions again, dictate - "Help"
 """
 
-let selectDestinationStartInstruction = "Dictate or enter a destination or choose from a previously saved location"
+let selectDestinationStartInstruction = "Dictate or enter a destination or choose from a previously saved location."
+
+let noActionOnUp = "There is not any action currently associated with the upwards gesture."
+let noActionOnLeft = "There is not any action currently associated with the left gesture."
+let noActionOnRight = "There is not any action currently associated with the right gesture."

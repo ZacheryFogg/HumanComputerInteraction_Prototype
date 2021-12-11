@@ -11,7 +11,7 @@ class SpeechService {
     
     public var muted: Bool = true
     private let synthesizer = AVSpeechSynthesizer()
-    var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.2
+    var rate: Float = AVSpeechUtteranceDefaultSpeechRate * 1.1
     
     func say(_ phrase: String) {
         print("\nSaying: \(phrase)\n")

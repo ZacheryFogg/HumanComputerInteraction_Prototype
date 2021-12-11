@@ -59,13 +59,6 @@ class CancelViewController: UIViewController {
         voiceOverlayController.settings.layout.inputScreen.titleInProgress = "Executing Command:"
         voiceOverlayController.settings.autoStopTimeout = 2.0
         
-        // Do any additional setup after loading the view.
-//        startDictationButton.backgroundColor = .systemRed
-//        startDictationButton.setTitleColor(.white, for: .normal)
-//
-//        startDictationButton.isAccessibilityElement = true
-//        startDictationButton.accessibilityHint = "Pressing this button start a process to listen for a voice command"
-        
         // Add gesture recognizers to view
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         longPressGesture.delegate = self
@@ -83,6 +76,10 @@ class CancelViewController: UIViewController {
         
         messageLabel.contentMode = .scaleToFill
         messageLabel.numberOfLines = 0
+        
+        messageLabel.isAccessibilityElement = true
+        messageLabel.accessibilityHint = "Message confirming the termination action"
+        
         terminationMenu.image = UIImage(named: terminationMenuName)
         
     }
@@ -97,6 +94,10 @@ class CancelViewController: UIViewController {
         case .Down:
             speechService.say("Returning to \(calledFrom!)")
             self.dismiss(animated: true, completion: nil)
+        case .Left:
+            speechService.say(noActionOnLeft)
+        case .Right:
+            speechService.say(noActionOnRight)
         default:
             break
         }
@@ -146,8 +147,12 @@ class CancelViewController: UIViewController {
         
     }
     
+    /*
+     This function terminates the current view and its parent view.
+     Returning to start menu
+     */
     func terminate(){
-        speechService.say("Terminating \(calledFrom!)")
+        speechService.say("Terminating \(calledFrom!). Returning to start menu")
         self.presentingViewController?.terminateFromChild(child: self)
         
     }
@@ -166,7 +171,7 @@ extension CancelViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(error)")
+            print("Error in Dictation: \(error!)")
         })
     }
     
@@ -194,9 +199,7 @@ extension CancelViewController: UIGestureRecognizerDelegate {
         
         let downStart = leftEnd + 0.01
         let downEnd = rightStart - 0.01
-        
-        // This logic should be updated later
-//        print("End: \(endPoint)")
+
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}

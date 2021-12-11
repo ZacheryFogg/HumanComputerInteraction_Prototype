@@ -88,6 +88,15 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         searchBar.delegate = self
         filteredData = data
         
+        searchBar.searchTextField.isAccessibilityElement = true
+        searchBar.searchTextField.accessibilityHint = "This is a search field to enter your destination"
+        
+        searchBar.isAccessibilityElement = true
+        searchBar.accessibilityHint = "This is a search box to enter your destination"
+        
+        tableView.isAccessibilityElement = true
+        tableView.accessibilityHint = "This is a vertically oriented table where each row is either one of your saved destinations or an address that matches your current search query"
+
     }
     
     /*
@@ -99,6 +108,8 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
         cell.backgroundColor = UIColor(red: 29/255, green: 85/255, blue: 120/255, alpha: 1.0)
         cell.textLabel?.textColor = .white
         cell.textLabel?.text = filteredData[indexPath.row]
+        cell.isAccessibilityElement = true
+        cell.accessibilityHint = "This is a selectable destination"
         return cell
     }
     
@@ -132,9 +143,9 @@ class SelectDestinationViewController: UIViewController, UITableViewDataSource, 
                 speechService.say(noPlayback)
             }
         case .Left:
-            speechService.say("There is currently no action available on Left Gesture.")
+            speechService.say(noActionOnLeft)
         case .Right:
-            speechService.say("There is currently no action available on Right Gesture.")
+            speechService.say(noActionOnRight)
         default:
             break
         }
@@ -198,7 +209,7 @@ extension SelectDestinationViewController: VoiceOverlayDelegate {
                 if !text.isEmpty {self.interpretValidVoiceCommand(text: text)}
             }
         }, errorHandler: { error in
-            print("Error in Dictation: \(error)")
+            print("Error in Dictation: \(error!)")
         })
     }
     
@@ -227,8 +238,6 @@ extension SelectDestinationViewController: UIGestureRecognizerDelegate {
         let downStart = leftEnd + 0.01
         let downEnd = rightStart - 0.01
         
-        // This logic should be updated later
-//        print("End: \(endPoint)")
         let angle = (atan2(endPoint.y, endPoint.x) * -180)/Double.pi
         
         if angle >= rightStart && angle <= rightEnd {return SwipeDirection.Right}
