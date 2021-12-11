@@ -2,6 +2,8 @@
 
 Final Project for CS 228: Human Computer Interaction
 
+Video ReadMe/Demonstration: https://youtu.be/MdYxrJrtxGU
+
 Instructions for using UI: 
 
 Although the audio output will instruct you on this upon UI startup: 
@@ -17,7 +19,7 @@ For this prototype, voice command recognition it primitive, and relies on a few 
 
 Any visual UI element is not associated with any functionality for the target user. If the UI was a black screen, it would function in the same way as it currently does (save for the destination selection process), as voice commands and gestures are the only ways to interact with the UI. 
 
-I demonstrate all areas of the UI in this 'Video ReadMe' on youtube, so skim that for a full walkthrough of functionality, but in any view, simply double tap and say "help" to be notified of the current affordances, and what you are expected to do in the current view. 
+I demonstrate all areas of the UI in this ( https://youtu.be/MdYxrJrtxGU )'Video ReadMe' on youtube, so skim that for a full walkthrough of functionality, but in any view, simply double tap and say "help" to be notified of the current affordances, and what you are expected to do in the current view. 
 
 Notes about the UI: 
 
