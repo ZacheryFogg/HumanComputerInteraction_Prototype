@@ -413,7 +413,7 @@ extension NavigationViewController: UIGestureRecognizerDelegate {
                 simulationIteration += 1
                 createAndPresentPopup(color: greenColor, message: "Entrance detected. Travel straight for 3 meters and the entrance will be directly in front of you", helpInstructions: notificationHelpInstructions )
             } else if simulationIteration == simulationOutputs.count + 2{
-                createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete", helpInstructions: notificationHelpInstructions )
+                createAndPresentPopup(color: greenColor, message: "You have arrived at Lafayette hall. Navigation complete. Returning to start menu.", helpInstructions: notificationHelpInstructions )
                 navigationComplete()
             }
         }
